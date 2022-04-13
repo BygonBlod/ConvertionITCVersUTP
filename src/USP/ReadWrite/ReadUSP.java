@@ -133,7 +133,7 @@ public class ReadUSP {
 								String sessionMask = sesEl.getAttribute("sessionsMask");
 								String attributeName = sesEl.getAttribute("attributeName");
 								String inSes = sesEl.getAttribute("in");
-								FilterUSP filter = null;
+								ArrayList<FilterUSP> filter = new ArrayList<>();
 								NodeList filterL = sesEl.getElementsByTagName("filter");
 								if (filterL != null) {
 									Node filterN = filterL.item(0);
@@ -143,9 +143,10 @@ public class ReadUSP {
 										String attributeNameFil = filterEl.getAttribute("attributeName");
 										String inF = filterEl.getAttribute("in");
 										String notIn = filterEl.getAttribute("notIn");
-										filter = new FilterUSP(type, attributeNameFil);
-										filter.setIn(inF);
-										filter.setNotIn(notIn);
+										FilterUSP fil = new FilterUSP(type, attributeNameFil);
+										fil.setIn(inF);
+										fil.setNotIn(notIn);
+										filter.add(fil);
 									}
 								}
 								SessionRuleUSP ses = new SessionRuleUSP(groupBy, filter);
