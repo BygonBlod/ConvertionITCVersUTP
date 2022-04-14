@@ -3,6 +3,7 @@ package Convertion.VersUSP;
 import java.util.ArrayList;
 
 import ITC.Model.ProblemITC;
+import ITC.Model.RoomITC;
 import ITC.Model.StudentITC;
 import USP.Model.CourseUSP;
 import USP.Model.RoomUSP;
@@ -23,6 +24,7 @@ public class ConvertisseurUSP {
 		ArrayList<SolutionUSP> solution = new ArrayList<>();
 
 		students = convertionStudents(students, problem.getStudents());
+		rooms = convertionRooms(rooms, problem.getRooms());
 
 		Timetabling time = new Timetabling(problem.getName(), problem.getNrWeeks(), problem.getNrDays(),
 				problem.getSlotsPerDay());
@@ -33,6 +35,14 @@ public class ConvertisseurUSP {
 		time.setStudents(students);
 		time.setTeachers(teachers);
 		return time;
+	}
+
+	private static ArrayList<RoomUSP> convertionRooms(ArrayList<RoomUSP> roomsUsp, ArrayList<RoomITC> roomsItc) {
+		for (RoomITC roomI : roomsItc) {
+			RoomUSP room = new RoomUSP(roomI.getId(), roomI.getCapacity(), "");
+			roomsUsp.add(room);
+		}
+		return roomsUsp;
 	}
 
 	private static ArrayList<StudentUSP> convertionStudents(ArrayList<StudentUSP> studentsUsp,

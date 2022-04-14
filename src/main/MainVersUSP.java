@@ -10,8 +10,6 @@ public class MainVersUSP {
 
 	public static void main(String[] args) {
 		ProblemITC problem = ReadITC.getProblem(args[0]);
-		// essai d'écriture
-		// WriteITC.write(problem, "fileITC.xml");
 
 		Timetabling time = ConvertisseurUSP.getTimeTabling(problem);
 
