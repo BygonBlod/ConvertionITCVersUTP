@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 public class AllowedRoomsUSP {
 	private String sessionRooms;
-	private ArrayList<String> rooms;
+	private ArrayList<AllowedRoomUSP> rooms;
 
-	public AllowedRoomsUSP(String sessionRooms, ArrayList<String> rooms) {
+	public AllowedRoomsUSP(String sessionRooms, ArrayList<AllowedRoomUSP> rooms) {
 		this.sessionRooms = sessionRooms;
 		this.rooms = rooms;
 	}
@@ -19,11 +19,11 @@ public class AllowedRoomsUSP {
 		this.sessionRooms = sessionRooms;
 	}
 
-	public ArrayList<String> getRooms() {
+	public ArrayList<AllowedRoomUSP> getRooms() {
 		return rooms;
 	}
 
-	public void setRooms(ArrayList<String> rooms) {
+	public void setRooms(ArrayList<AllowedRoomUSP> rooms) {
 		this.rooms = rooms;
 	}
 
