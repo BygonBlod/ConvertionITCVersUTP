@@ -17,10 +17,17 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import USP.Model.AllowedRoomUSP;
+import USP.Model.AllowedRoomsUSP;
+import USP.Model.AllowedSlotsUSP;
+import USP.Model.AllowedTeacher;
+import USP.Model.AllowedTeachersUSP;
+import USP.Model.ClassUSP;
 import USP.Model.ConstraintUSP;
 import USP.Model.CourseUSP;
 import USP.Model.FilterUSP;
 import USP.Model.ParameterUSP;
+import USP.Model.PartUSP;
 import USP.Model.RoomUSP;
 import USP.Model.RuleUSP;
 import USP.Model.SessionRuleUSP;
@@ -146,7 +153,74 @@ public class WriteUSP {
 	}
 
 	private static void setCourses(Document document, Element racine, ArrayList<CourseUSP> courses) {
-		// TODO Auto-generated method stub
+		Element courseS = document.createElement("courses");
+		racine.appendChild(courseS);
+		for (CourseUSP course : courses) {
+			Element coursE = document.createElement("course");
+			courseS.appendChild(coursE);
+			coursE.setAttribute("id", course.getId());
+			if (course.getLabel() != null && !course.getLabel().equals("")) {
+				coursE.setAttribute("label", course.getLabel());
+			}
+			for (PartUSP part : course.getParts()) {
+				Element partE = document.createElement("part");
+				coursE.appendChild(partE);
+				partE.setAttribute("id", part.getId());
+				partE.setAttribute("nrSessions", part.getNrSessions());
+				if (part.getLabel() != null && !part.getLabel().equals("")) {
+					partE.setAttribute("label", part.getLabel());
+				}
+				Element classesE = document.createElement("classes");
+				partE.appendChild(classesE);
+				for (ClassUSP classe : part.getClasses()) {
+					Element classE = document.createElement("class");
+					classesE.appendChild(classE);
+					classE.setAttribute("id", classe.getId());
+					classE.setAttribute("maxHeadCount", classe.getMaxHeadCount());
+					if (classe.getParent() != null && !classe.getParent().equals("")) {
+						classE.setAttribute("parent", classe.getParent());
+					}
+				}
+				AllowedSlotsUSP slots = part.getSlot();
+				Element slotE = document.createElement("allowedSlots");
+				partE.appendChild(slotE);
+				slotE.setAttribute("sessionLength", slots.getSessionLength());
+				Element daily = document.createElement("dailySlots");
+				slotE.appendChild(daily);
+				daily.setTextContent(slots.getDailySlots());
+				Element days = document.createElement("days");
+				slotE.appendChild(days);
+				days.setTextContent(slots.getDays());
+				Element weeks = document.createElement("weeks");
+				slotE.appendChild(weeks);
+				weeks.setTextContent(slots.getWeeks());
+
+				AllowedRoomsUSP rooms = part.getRoom();
+				Element roomsE = document.createElement("allowedRooms");
+				partE.appendChild(roomsE);
+				roomsE.setAttribute("sessionRooms", rooms.getSessionRooms());
+				for (AllowedRoomUSP room : rooms.getRooms()) {
+					Element roomE = document.createElement("room");
+					roomsE.appendChild(roomE);
+					roomE.setAttribute("refId", room.getRefId());
+					if (room.getMandatory() != null && !room.getMandatory().equals("")) {
+						roomE.setAttribute("mandatory", room.getMandatory());
+					}
+				}
+
+				AllowedTeachersUSP teachers = part.getTeacher();
+				Element teacherE = document.createElement("allowedTeachers");
+				partE.appendChild(teacherE);
+				teacherE.setAttribute("sessionTeachers", teachers.getSessionTeachers());
+				for (AllowedTeacher teach : teachers.getTeacher()) {
+					Element teachE = document.createElement("teacher");
+					teacherE.appendChild(teachE);
+					teachE.setAttribute("refId", teach.getRefId());
+					teachE.setAttribute("nrSessions", teach.getNrSessions());
+				}
+			}
+
+		}
 
 	}
 

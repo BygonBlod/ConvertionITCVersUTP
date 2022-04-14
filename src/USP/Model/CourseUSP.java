@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class CourseUSP {
 	private String id;
+	private String label;
 	private ArrayList<PartUSP> parts;
 
 	public CourseUSP(String id, ArrayList<PartUSP> parts) {
@@ -17,6 +18,14 @@ public class CourseUSP {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	public ArrayList<PartUSP> getParts() {

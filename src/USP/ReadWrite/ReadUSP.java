@@ -253,6 +253,7 @@ public class ReadUSP {
 
 	private static CourseUSP getCourse(Element e) {
 		String idCourse = e.getAttribute("id");
+		String label = e.getAttribute("label");
 		ArrayList<PartUSP> parts = new ArrayList<>();
 
 		NodeList partS = e.getElementsByTagName("part");
@@ -266,7 +267,9 @@ public class ReadUSP {
 				}
 			}
 		}
-		return new CourseUSP(idCourse, parts);
+		CourseUSP cour = new CourseUSP(idCourse, parts);
+		cour.setLabel(label);
+		return cour;
 	}
 
 	private static PartUSP getPartUSP(Element part) {
