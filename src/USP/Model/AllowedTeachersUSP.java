@@ -2,13 +2,11 @@ package USP.Model;
 
 import java.util.ArrayList;
 
-import Utils.Pair;
-
 public class AllowedTeachersUSP {
 	private String sessionTeachers;
-	private ArrayList<Pair<String, String>> teacher;
+	private ArrayList<AllowedTeacher> teacher;
 
-	public AllowedTeachersUSP(String sessionTeachers, ArrayList<Pair<String, String>> teacher) {
+	public AllowedTeachersUSP(String sessionTeachers, ArrayList<AllowedTeacher> teacher) {
 		this.sessionTeachers = sessionTeachers;
 		this.teacher = teacher;
 	}
@@ -21,11 +19,11 @@ public class AllowedTeachersUSP {
 		this.sessionTeachers = sessionTeachers;
 	}
 
-	public ArrayList<Pair<String, String>> getTeacher() {
+	public ArrayList<AllowedTeacher> getTeacher() {
 		return teacher;
 	}
 
-	public void setTeacher(ArrayList<Pair<String, String>> teacher) {
+	public void setTeacher(ArrayList<AllowedTeacher> teacher) {
 		this.teacher = teacher;
 	}
 

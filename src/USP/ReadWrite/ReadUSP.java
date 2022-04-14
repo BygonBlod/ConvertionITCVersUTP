@@ -11,13 +11,22 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.traversal.DocumentTraversal;
 
+import USP.Model.AllowedRoomUSP;
+import USP.Model.AllowedRoomsUSP;
+import USP.Model.AllowedSlotsUSP;
+import USP.Model.AllowedTeacher;
+import USP.Model.AllowedTeachersUSP;
+import USP.Model.ClassUSP;
 import USP.Model.ConstraintUSP;
 import USP.Model.CourseUSP;
 import USP.Model.FilterUSP;
+import USP.Model.GroupSolutionUSP;
 import USP.Model.ParameterUSP;
+import USP.Model.PartUSP;
 import USP.Model.RoomUSP;
 import USP.Model.RuleUSP;
 import USP.Model.SessionRuleUSP;
+import USP.Model.SessionSolutionUSP;
 import USP.Model.SolutionUSP;
 import USP.Model.StudentUSP;
 import USP.Model.TeacherUSP;
@@ -108,6 +117,8 @@ public class ReadUSP {
 				Node n = solutionS.item(j);
 				if (n.getNodeType() == Node.ELEMENT_NODE) {
 					Element e = (Element) n;
+					ArrayList<GroupSolutionUSP> groups = new ArrayList<>();
+					ArrayList<SessionSolutionUSP> sessions = new ArrayList<>();
 				}
 			}
 		}
@@ -136,17 +147,19 @@ public class ReadUSP {
 								ArrayList<FilterUSP> filter = new ArrayList<>();
 								NodeList filterL = sesEl.getElementsByTagName("filter");
 								if (filterL != null) {
-									Node filterN = filterL.item(0);
-									if (filterN.getNodeType() == Node.ELEMENT_NODE) {
-										Element filterEl = (Element) filterN;
-										String type = filterEl.getAttribute("type");
-										String attributeNameFil = filterEl.getAttribute("attributeName");
-										String inF = filterEl.getAttribute("in");
-										String notIn = filterEl.getAttribute("notIn");
-										FilterUSP fil = new FilterUSP(type, attributeNameFil);
-										fil.setIn(inF);
-										fil.setNotIn(notIn);
-										filter.add(fil);
+									for (int k = 0; k < filterL.getLength(); k++) {
+										Node filterN = filterL.item(k);
+										if (filterN.getNodeType() == Node.ELEMENT_NODE) {
+											Element filterEl = (Element) filterN;
+											String type = filterEl.getAttribute("type");
+											String attributeNameFil = filterEl.getAttribute("attributeName");
+											String inF = filterEl.getAttribute("in");
+											String notIn = filterEl.getAttribute("notIn");
+											FilterUSP fil = new FilterUSP(type, attributeNameFil);
+											fil.setIn(inF);
+											fil.setNotIn(notIn);
+											filter.add(fil);
+										}
 									}
 								}
 								SessionRuleUSP ses = new SessionRuleUSP(groupBy, filter);
@@ -230,9 +243,141 @@ public class ReadUSP {
 				Node n = courseS.item(j);
 				if (n.getNodeType() == Node.ELEMENT_NODE) {
 					Element e = (Element) n;
+					CourseUSP cour = getCourse(e);
+					courses.add(cour);
+
 				}
 			}
 		}
+	}
+
+	private static CourseUSP getCourse(Element e) {
+		String idCourse = e.getAttribute("id");
+		String label = e.getAttribute("label");
+		ArrayList<PartUSP> parts = new ArrayList<>();
+
+		NodeList partS = e.getElementsByTagName("part");
+		if (partS != null) {
+			for (int j = 0; j < partS.getLength(); j++) {// pour chaque part
+				Node nPart = partS.item(j);
+				if (nPart.getNodeType() == Node.ELEMENT_NODE) {
+					Element part = (Element) nPart;
+					PartUSP PartU = getPartUSP(part);
+					parts.add(PartU);
+				}
+			}
+		}
+		CourseUSP cour = new CourseUSP(idCourse, parts);
+		cour.setLabel(label);
+		return cour;
+	}
+
+	private static PartUSP getPartUSP(Element part) {
+		String idPart = part.getAttribute("id");
+		String nrSessions = part.getAttribute("nrSessions");
+		String label = part.getAttribute("label");
+		ArrayList<ClassUSP> classes = new ArrayList<>();
+		AllowedSlotsUSP slotU = new AllowedSlotsUSP("", "", "", "");
+		AllowedRoomsUSP roomU = new AllowedRoomsUSP("", new ArrayList<>());
+		AllowedTeachersUSP teacherU = new AllowedTeachersUSP("", new ArrayList<>());
+		NodeList slotsL = part.getElementsByTagName("allowedSlots");
+		Node n = slotsL.item(0);
+		if (n.getNodeType() == Node.ELEMENT_NODE) {
+			Element slot = (Element) n;
+			slotU = getAllowedSlots(slot);
+		}
+		NodeList roomsL = part.getElementsByTagName("allowedRooms");
+		Node n1 = roomsL.item(0);
+		if (n1.getNodeType() == Node.ELEMENT_NODE) {
+			Element room = (Element) n1;
+			roomU = getAllowedRooms(room);
+		}
+		NodeList teacherL = part.getElementsByTagName("allowedTeachers");
+		Node n2 = teacherL.item(0);
+		if (n2.getNodeType() == Node.ELEMENT_NODE) {
+			Element teacher = (Element) n2;
+			teacherU = getAllowedTeachers(teacher);
+		}
+
+		NodeList classeL = part.getElementsByTagName("class");
+		for (int i = 0; i < classeL.getLength(); i++) {
+			Node clas = classeL.item(i);
+			if (clas.getNodeType() == Node.ELEMENT_NODE) {
+				Element classe = (Element) clas;
+				ClassUSP classU = getClassUSp(classe);
+				classes.add(classU);
+			}
+		}
+
+		return new PartUSP(idPart, nrSessions, label, classes, slotU, roomU, teacherU);
+	}
+
+	private static AllowedTeachersUSP getAllowedTeachers(Element teacher) {
+		String sessionTeachers = teacher.getAttribute("sessionTeachers");
+		ArrayList<AllowedTeacher> teacherS = new ArrayList<>();
+
+		NodeList list = teacher.getElementsByTagName("teacher");
+		for (int i = 0; i < list.getLength(); i++) {
+			Node teacherN = list.item(i);
+			if (teacherN.getNodeType() == Node.ELEMENT_NODE) {
+				Element ele = (Element) teacherN;
+				String ref = ele.getAttribute("refId");
+				String nrSessions = ele.getAttribute("nrSessions");
+				teacherS.add(new AllowedTeacher(ref, nrSessions));
+			}
+		}
+		return new AllowedTeachersUSP(sessionTeachers, teacherS);
+	}
+
+	private static AllowedRoomsUSP getAllowedRooms(Element room) {
+		String sessionRooms = room.getAttribute("sessionRooms");
+		ArrayList<AllowedRoomUSP> roomS = new ArrayList<>();
+
+		NodeList list = room.getElementsByTagName("room");
+		for (int i = 0; i < list.getLength(); i++) {
+			Node roomN = list.item(i);
+			if (roomN.getNodeType() == Node.ELEMENT_NODE) {
+				Element ele = (Element) roomN;
+				String ref = ele.getAttribute("refId");
+				String mandatory = ele.getAttribute("mandatory");
+				roomS.add(new AllowedRoomUSP(ref, mandatory));
+			}
+		}
+		return new AllowedRoomsUSP(sessionRooms, roomS);
+	}
+
+	private static AllowedSlotsUSP getAllowedSlots(Element slot) {
+		String sessionLength = slot.getAttribute("sessionLength");
+		String dailySlots = "", days = "", weeks = "";
+		NodeList list = slot.getChildNodes();
+		for (int i = 0; i < list.getLength(); i++) {
+			Node node = list.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element ele = (Element) node;
+				switch (ele.getTagName()) {
+				case "dailySlots":
+					dailySlots = ele.getTextContent();
+					break;
+				case "days":
+					days = ele.getTextContent();
+					break;
+				case "weeks":
+					weeks = ele.getTextContent();
+					break;
+				}
+			}
+
+		}
+		return new AllowedSlotsUSP(sessionLength, dailySlots, days, weeks);
+	}
+
+	private static ClassUSP getClassUSp(Element classe) {
+		String idClas = classe.getAttribute("id");
+		String maxHeadCount = classe.getAttribute("maxHeadCount");
+		String parent = classe.getAttribute("parent");
+		ClassUSP res = new ClassUSP(idClas, maxHeadCount);
+		res.setParent(parent);
+		return res;
 	}
 
 	private static void parseTeachers(Element element) {
