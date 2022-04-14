@@ -136,17 +136,19 @@ public class ReadUSP {
 								ArrayList<FilterUSP> filter = new ArrayList<>();
 								NodeList filterL = sesEl.getElementsByTagName("filter");
 								if (filterL != null) {
-									Node filterN = filterL.item(0);
-									if (filterN.getNodeType() == Node.ELEMENT_NODE) {
-										Element filterEl = (Element) filterN;
-										String type = filterEl.getAttribute("type");
-										String attributeNameFil = filterEl.getAttribute("attributeName");
-										String inF = filterEl.getAttribute("in");
-										String notIn = filterEl.getAttribute("notIn");
-										FilterUSP fil = new FilterUSP(type, attributeNameFil);
-										fil.setIn(inF);
-										fil.setNotIn(notIn);
-										filter.add(fil);
+									for (int k = 0; k < filterL.getLength(); k++) {
+										Node filterN = filterL.item(k);
+										if (filterN.getNodeType() == Node.ELEMENT_NODE) {
+											Element filterEl = (Element) filterN;
+											String type = filterEl.getAttribute("type");
+											String attributeNameFil = filterEl.getAttribute("attributeName");
+											String inF = filterEl.getAttribute("in");
+											String notIn = filterEl.getAttribute("notIn");
+											FilterUSP fil = new FilterUSP(type, attributeNameFil);
+											fil.setIn(inF);
+											fil.setNotIn(notIn);
+											filter.add(fil);
+										}
 									}
 								}
 								SessionRuleUSP ses = new SessionRuleUSP(groupBy, filter);
