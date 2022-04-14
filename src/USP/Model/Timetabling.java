@@ -15,7 +15,6 @@ public class Timetabling {
 	private ArrayList<SolutionUSP> solution;
 
 	public Timetabling(String name, String nrWeeks, String nrDaysPerWeek, String nrSlotsPerDay) {
-		super();
 		this.name = name;
 		this.nrWeeks = nrWeeks;
 		this.nrDaysPerWeek = nrDaysPerWeek;
