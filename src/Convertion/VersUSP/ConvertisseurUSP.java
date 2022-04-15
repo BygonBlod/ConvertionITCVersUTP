@@ -21,10 +21,11 @@ public class ConvertisseurUSP {
 		ArrayList<CourseUSP> courses = new ArrayList<>();
 		ArrayList<StudentUSP> students = new ArrayList<>();
 		ArrayList<RuleUSP> rules = new ArrayList<>();
-		ArrayList<SolutionUSP> solution = new ArrayList<>();
+		SolutionUSP solution;
 
 		students = convertionStudents(students, problem.getStudents());
 		rooms = convertionRooms(rooms, problem.getRooms());
+		solution = new SolutionUSP();
 
 		Timetabling time = new Timetabling(problem.getName(), problem.getNrWeeks(), problem.getNrDays(),
 				problem.getSlotsPerDay());

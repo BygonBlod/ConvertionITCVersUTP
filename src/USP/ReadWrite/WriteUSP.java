@@ -26,14 +26,18 @@ import USP.Model.ClassUSP;
 import USP.Model.ConstraintUSP;
 import USP.Model.CourseUSP;
 import USP.Model.FilterUSP;
+import USP.Model.GroupSolutionUSP;
 import USP.Model.ParameterUSP;
 import USP.Model.PartUSP;
 import USP.Model.RoomUSP;
 import USP.Model.RuleUSP;
 import USP.Model.SessionRuleUSP;
+import USP.Model.SessionSolutionUSP;
+import USP.Model.SolutionUSP;
 import USP.Model.StudentUSP;
 import USP.Model.TeacherUSP;
 import USP.Model.Timetabling;
+import Utils.Value_USP;
 
 public class WriteUSP {
 
@@ -44,10 +48,10 @@ public class WriteUSP {
 			final Document document = builder.newDocument();
 			final Element racine = document.createElement("timetabling");
 			document.appendChild(racine);
-			racine.setAttribute("name", time.getName());
-			racine.setAttribute("nrDaysPerWeek", time.getNrDaysPerWeek());
-			racine.setAttribute("nrSlotsPerDay", time.getNrSlotsPerDay());
-			racine.setAttribute("nrWeeks", time.getNrWeeks());
+			racine.setAttribute(Value_USP.Attibute_Name, time.getName());
+			racine.setAttribute(Value_USP.Attibute_NrDaysPerWeek, time.getNrDaysPerWeek());
+			racine.setAttribute(Value_USP.Attibute_NrSlotsPerDay, time.getNrSlotsPerDay());
+			racine.setAttribute(Value_USP.Attibute_NrWeeks, time.getNrWeeks());
 			racine.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 			racine.setAttribute("xsi:schemaLocation", "test");// à changer par usp_timetabling_v0_2.xsd
 
@@ -56,6 +60,7 @@ public class WriteUSP {
 			setCourses(document, racine, time.getCourses());
 			setStudents(document, racine, time.getStudents());
 			setRules(document, racine, time.getRules());
+			setSolution(document, racine, time.getSolution());
 
 			// écriture dans un fichier
 			final TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -84,62 +89,109 @@ public class WriteUSP {
 		}
 	}
 
+	private static void setSolution(Document document, Element racine, SolutionUSP solution) {
+		Element solutionE = document.createElement(Value_USP.Time_Solution);
+		racine.appendChild(solutionE);
+		Element groupsE = document.createElement(Value_USP.Solution_Groups);
+		solutionE.appendChild(groupsE);
+		for (GroupSolutionUSP group : solution.getGroups()) {
+			Element groupE = document.createElement(Value_USP.Groups_Group);
+			groupsE.appendChild(groupE);
+			groupE.setAttribute(Value_USP.Attibute_Id, group.getId());
+			groupE.setAttribute(Value_USP.Attibute_HeadCount, group.getHeadCount());
+			Element studentsE = document.createElement(Value_USP.Group_Students);
+			groupE.appendChild(studentsE);
+			for (String std : group.getStudents()) {
+				Element studentE = document.createElement(Value_USP.SolutionStudents_Student);
+				studentsE.appendChild(studentE);
+				studentE.setAttribute(Value_USP.Attibute_RefId, std);
+			}
+			Element classesE = document.createElement(Value_USP.Group_Classes);
+			groupE.appendChild(classesE);
+			for (String cla : group.getClasses()) {
+				Element classE = document.createElement(Value_USP.SolutionClasses_Class);
+				classesE.appendChild(classE);
+				classE.setAttribute(Value_USP.Attibute_RefId, cla);
+			}
+		}
+		Element sessionsE = document.createElement(Value_USP.Solution_Sessions);
+		solutionE.appendChild(sessionsE);
+		for (SessionSolutionUSP ses : solution.getSessions()) {
+			Element sessionE = document.createElement(Value_USP.SolutionSessions_Session);
+			sessionsE.appendChild(sessionE);
+			sessionE.setAttribute(Value_USP.Attibute_Class, ses.getClasse());
+			sessionE.setAttribute(Value_USP.Attibute_Rank, ses.getRank());
+			if (ses.getSlot() != null && !ses.getSlot().equals("")) {
+				sessionE.setAttribute(Value_USP.Attibute_Slot, ses.getSlot());
+			}
+			if (ses.getRooms() != null && !ses.getRooms().equals("")) {
+				sessionE.setAttribute(Value_USP.Attibute_Rooms, ses.getRooms());
+			}
+			if (ses.getTeachers() != null && !ses.getTeachers().equals("")) {
+				sessionE.setAttribute(Value_USP.Attibute_Teachers, ses.getTeachers());
+			}
+		}
+	}
+
 	private static void setRules(Document document, Element racine, ArrayList<RuleUSP> rules) {
-		Element ruleS = document.createElement("rules");
+		Element ruleS = document.createElement(Value_USP.Time_Rules);
 		racine.appendChild(ruleS);
 		for (RuleUSP rule : rules) {
-			Element ruleE = document.createElement("rule");
+			Element ruleE = document.createElement(Value_USP.Rules_Rule);
 			ruleS.appendChild(ruleE);
 			for (SessionRuleUSP ses : rule.getSessions()) {
-				Element sesE = document.createElement("sessions");
+				Element sesE = document.createElement(Value_USP.Rule_Sessions);
 				ruleE.appendChild(sesE);
 				if (ses.getGroupBy() != null && !ses.getGroupBy().equals("")) {
-					sesE.setAttribute("groupBy", ses.getGroupBy());
+					sesE.setAttribute(Value_USP.Attibute_GroupBy, ses.getGroupBy());
 				}
 				if (ses.getAttributeName() != null && !ses.getAttributeName().equals("")) {
-					sesE.setAttribute("attributeName", ses.getAttributeName());
+					sesE.setAttribute(Value_USP.Attibute_AttributeName, ses.getAttributeName());
 				}
 				if (ses.getSessionsMask() != null && !ses.getSessionsMask().equals("")) {
-					sesE.setAttribute("sessionsMask", ses.getSessionsMask());
+					sesE.setAttribute(Value_USP.Attibute_SessionsMask, ses.getSessionsMask());
 				}
 				if (ses.getIn() != null && !ses.getIn().equals("")) {
-					sesE.setAttribute("in", ses.getIn());
+					sesE.setAttribute(Value_USP.Attibute_In, ses.getIn());
+				}
+				if (ses.getNotIn() != null && !ses.getNotIn().equals("")) {
+					sesE.setAttribute(Value_USP.Attibute_NotIn, ses.getNotIn());
 				}
 				if (ses.getFilter() != null) {
 					ArrayList<FilterUSP> filters = ses.getFilter();
 					for (FilterUSP filter : filters) {
-						Element filterE = document.createElement("filter");
+						Element filterE = document.createElement(Value_USP.Sessions_Filter);
 						sesE.appendChild(filterE);
 						if (filter.getType() != null && !filter.getType().equals("")) {
-							filterE.setAttribute("type", filter.getType());
+							filterE.setAttribute(Value_USP.Attibute_Type, filter.getType());
 						}
 						if (filter.getAttributeName() != null && !filter.getAttributeName().equals("")) {
-							filterE.setAttribute("attributeName", filter.getAttributeName());
+							filterE.setAttribute(Value_USP.Attibute_AttributeName, filter.getAttributeName());
 						}
 						if (filter.getIn() != null && !filter.getIn().equals("")) {
-							filterE.setAttribute("in", filter.getIn());
+							filterE.setAttribute(Value_USP.Attibute_In, filter.getIn());
 						}
 						if (filter.getNotIn() != null && !filter.getNotIn().equals("")) {
-							filterE.setAttribute("notIn", filter.getNotIn());
+							filterE.setAttribute(Value_USP.Attibute_NotIn, filter.getNotIn());
 						}
 					}
 				}
 			}
 			for (ConstraintUSP cons : rule.getConstraint()) {
-				Element consE = document.createElement("constraint");
+				Element consE = document.createElement(Value_USP.Rule_Constraint);
 				ruleE.appendChild(consE);
-				consE.setAttribute("name", cons.getName());
-				consE.setAttribute("type", cons.getType());
+				consE.setAttribute(Value_USP.Attibute_Name, cons.getName());
+				consE.setAttribute(Value_USP.Attibute_Type, cons.getType());
 				consE.setTextContent(" \n");
 				if (cons.getParameters().size() > 0) {
-					Element parameters = document.createElement("parameters");
+					Element parameters = document.createElement(Value_USP.Constraint_Parameters);
 					consE.appendChild(parameters);
 					for (ParameterUSP param : cons.getParameters()) {
-						Element paramE = document.createElement("parameter");
+						Element paramE = document.createElement(Value_USP.Prameters_Parameter);
 						parameters.appendChild(paramE);
-						paramE.setAttribute("name", param.getName());
+						paramE.setAttribute(Value_USP.Attibute_Name, param.getName());
 						if (param.getType() != null && !param.getType().equals("")) {
-							paramE.setAttribute("type", param.getType());
+							paramE.setAttribute(Value_USP.Attibute_Type, param.getType());
 						}
 						if (param.getValue() != null && !param.getValue().equals("")) {
 							paramE.setTextContent(param.getValue());
@@ -153,70 +205,70 @@ public class WriteUSP {
 	}
 
 	private static void setCourses(Document document, Element racine, ArrayList<CourseUSP> courses) {
-		Element courseS = document.createElement("courses");
+		Element courseS = document.createElement(Value_USP.Time_Coursess);
 		racine.appendChild(courseS);
 		for (CourseUSP course : courses) {
-			Element coursE = document.createElement("course");
+			Element coursE = document.createElement(Value_USP.Courses_Course);
 			courseS.appendChild(coursE);
-			coursE.setAttribute("id", course.getId());
+			coursE.setAttribute(Value_USP.Attibute_Id, course.getId());
 			if (course.getLabel() != null && !course.getLabel().equals("")) {
-				coursE.setAttribute("label", course.getLabel());
+				coursE.setAttribute(Value_USP.Attibute_Label, course.getLabel());
 			}
 			for (PartUSP part : course.getParts()) {
-				Element partE = document.createElement("part");
+				Element partE = document.createElement(Value_USP.Course_Part);
 				coursE.appendChild(partE);
-				partE.setAttribute("id", part.getId());
-				partE.setAttribute("nrSessions", part.getNrSessions());
+				partE.setAttribute(Value_USP.Attibute_Id, part.getId());
+				partE.setAttribute(Value_USP.Attibute_NrSessions, part.getNrSessions());
 				if (part.getLabel() != null && !part.getLabel().equals("")) {
-					partE.setAttribute("label", part.getLabel());
+					partE.setAttribute(Value_USP.Attibute_Label, part.getLabel());
 				}
-				Element classesE = document.createElement("classes");
+				Element classesE = document.createElement(Value_USP.Part_Classes);
 				partE.appendChild(classesE);
 				for (ClassUSP classe : part.getClasses()) {
-					Element classE = document.createElement("class");
+					Element classE = document.createElement(Value_USP.Classes_Class);
 					classesE.appendChild(classE);
-					classE.setAttribute("id", classe.getId());
-					classE.setAttribute("maxHeadCount", classe.getMaxHeadCount());
+					classE.setAttribute(Value_USP.Attibute_Id, classe.getId());
+					classE.setAttribute(Value_USP.Attibute_MaxHeadCount, classe.getMaxHeadCount());
 					if (classe.getParent() != null && !classe.getParent().equals("")) {
-						classE.setAttribute("parent", classe.getParent());
+						classE.setAttribute(Value_USP.Attibute_Parent, classe.getParent());
 					}
 				}
 				AllowedSlotsUSP slots = part.getSlot();
-				Element slotE = document.createElement("allowedSlots");
+				Element slotE = document.createElement(Value_USP.Part_AllowedSlots);
 				partE.appendChild(slotE);
 				slotE.setAttribute("sessionLength", slots.getSessionLength());
-				Element daily = document.createElement("dailySlots");
+				Element daily = document.createElement(Value_USP.AllowedSlots_DailySlots);
 				slotE.appendChild(daily);
 				daily.setTextContent(slots.getDailySlots());
-				Element days = document.createElement("days");
+				Element days = document.createElement(Value_USP.AllowedSlots_Days);
 				slotE.appendChild(days);
 				days.setTextContent(slots.getDays());
-				Element weeks = document.createElement("weeks");
+				Element weeks = document.createElement(Value_USP.AllowedSlots_Weeks);
 				slotE.appendChild(weeks);
 				weeks.setTextContent(slots.getWeeks());
 
 				AllowedRoomsUSP rooms = part.getRoom();
-				Element roomsE = document.createElement("allowedRooms");
+				Element roomsE = document.createElement(Value_USP.Part_AllowedRooms);
 				partE.appendChild(roomsE);
-				roomsE.setAttribute("sessionRooms", rooms.getSessionRooms());
+				roomsE.setAttribute(Value_USP.Attibute_SessionRooms, rooms.getSessionRooms());
 				for (AllowedRoomUSP room : rooms.getRooms()) {
-					Element roomE = document.createElement("room");
+					Element roomE = document.createElement(Value_USP.AllowedRooms_Room);
 					roomsE.appendChild(roomE);
-					roomE.setAttribute("refId", room.getRefId());
+					roomE.setAttribute(Value_USP.Attibute_RefId, room.getRefId());
 					if (room.getMandatory() != null && !room.getMandatory().equals("")) {
-						roomE.setAttribute("mandatory", room.getMandatory());
+						roomE.setAttribute(Value_USP.Attibute_Mandatory, room.getMandatory());
 					}
 				}
 
 				AllowedTeachersUSP teachers = part.getTeacher();
-				Element teacherE = document.createElement("allowedTeachers");
+				Element teacherE = document.createElement(Value_USP.Part_AllowedTeachers);
 				partE.appendChild(teacherE);
-				teacherE.setAttribute("sessionTeachers", teachers.getSessionTeachers());
+				teacherE.setAttribute(Value_USP.Attibute_SessionTeachers, teachers.getSessionTeachers());
 				for (AllowedTeacher teach : teachers.getTeacher()) {
-					Element teachE = document.createElement("teacher");
+					Element teachE = document.createElement(Value_USP.AllowedTeachers_Teacher);
 					teacherE.appendChild(teachE);
-					teachE.setAttribute("refId", teach.getRefId());
-					teachE.setAttribute("nrSessions", teach.getNrSessions());
+					teachE.setAttribute(Value_USP.Attibute_RefId, teach.getRefId());
+					teachE.setAttribute(Value_USP.Attibute_NrSessions, teach.getNrSessions());
 				}
 			}
 
@@ -225,20 +277,22 @@ public class WriteUSP {
 	}
 
 	private static void setStudents(Document document, Element racine, ArrayList<StudentUSP> students) {
-		Element studentS = document.createElement("students");
+		Element studentS = document.createElement(Value_USP.Time_Students);
 		racine.appendChild(studentS);
 		for (StudentUSP student : students) {
-			Element studentE = document.createElement("student");
+			Element studentE = document.createElement(Value_USP.Students_Student);
 			studentS.appendChild(studentE);
-			studentE.setAttribute("id", student.getId());
-			studentE.setAttribute("label", student.getLabel());
+			studentE.setAttribute(Value_USP.Attibute_Id, student.getId());
+			if (!student.getLabel().equals("")) {
+				studentE.setAttribute(Value_USP.Attibute_Label, student.getLabel());
+			}
 			if (student.getCourses().size() > 0) {
-				Element courses = document.createElement("courses");
+				Element courses = document.createElement(Value_USP.Student_Courses);
 				studentE.appendChild(courses);
 				for (String s : student.getCourses()) {
-					Element course = document.createElement("course");
+					Element course = document.createElement(Value_USP.StudentCourses_Course);
 					courses.appendChild(course);
-					course.setAttribute("refId", s);
+					course.setAttribute(Value_USP.Attibute_RefId, s);
 				}
 			}
 		}
@@ -246,26 +300,30 @@ public class WriteUSP {
 	}
 
 	private static void setTeachers(Document document, Element racine, ArrayList<TeacherUSP> teachers) {
-		Element teacherS = document.createElement("teachers");
+		Element teacherS = document.createElement(Value_USP.Time_Teachers);
 		racine.appendChild(teacherS);
 		for (TeacherUSP teacher : teachers) {
-			Element teacherE = document.createElement("teacher");
+			Element teacherE = document.createElement(Value_USP.Teachers_Teacher);
 			teacherS.appendChild(teacherE);
-			teacherE.setAttribute("id", teacher.getId());
-			teacherE.setAttribute("label", teacher.getLabel());
+			teacherE.setAttribute(Value_USP.Attibute_Id, teacher.getId());
+			if (!teacher.getLabel().equals("")) {
+				teacherE.setAttribute(Value_USP.Attibute_Label, teacher.getLabel());
+			}
 		}
 
 	}
 
 	private static void setRooms(Document document, Element racine, ArrayList<RoomUSP> rooms) {
-		Element roomS = document.createElement("rooms");
+		Element roomS = document.createElement(Value_USP.Time_Rooms);
 		racine.appendChild(roomS);
 		for (RoomUSP room : rooms) {
-			Element roomE = document.createElement("room");
+			Element roomE = document.createElement(Value_USP.Rooms_Room);
 			roomS.appendChild(roomE);
-			roomE.setAttribute("id", room.getId());
-			roomE.setAttribute("capacity", room.getCapacity());
-			roomE.setAttribute("label", room.getLabel());
+			roomE.setAttribute(Value_USP.Attibute_Id, room.getId());
+			roomE.setAttribute(Value_USP.Attibute_Capacity, room.getCapacity());
+			if (!room.getLabel().equals("")) {
+				roomE.setAttribute(Value_USP.Attibute_Label, room.getLabel());
+			}
 		}
 
 	}

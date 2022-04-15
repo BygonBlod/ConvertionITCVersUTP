@@ -12,7 +12,7 @@ public class Timetabling {
 	private ArrayList<CourseUSP> courses;
 	private ArrayList<StudentUSP> students;
 	private ArrayList<RuleUSP> rules;
-	private ArrayList<SolutionUSP> solution;
+	private SolutionUSP solution;
 
 	public Timetabling(String name, String nrWeeks, String nrDaysPerWeek, String nrSlotsPerDay) {
 		this.name = name;
@@ -93,11 +93,11 @@ public class Timetabling {
 		this.rules = rules;
 	}
 
-	public ArrayList<SolutionUSP> getSolution() {
+	public SolutionUSP getSolution() {
 		return solution;
 	}
 
-	public void setSolution(ArrayList<SolutionUSP> solution) {
+	public void setSolution(SolutionUSP solution) {
 		this.solution = solution;
 	}
 

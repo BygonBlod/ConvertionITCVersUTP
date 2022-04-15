@@ -31,6 +31,7 @@ import USP.Model.SolutionUSP;
 import USP.Model.StudentUSP;
 import USP.Model.TeacherUSP;
 import USP.Model.Timetabling;
+import Utils.Value_USP;
 
 public class ReadUSP {
 	static Timetabling timeTabling;
@@ -39,7 +40,7 @@ public class ReadUSP {
 	static ArrayList<CourseUSP> courses;
 	static ArrayList<StudentUSP> students;
 	static ArrayList<RuleUSP> rules;
-	static ArrayList<SolutionUSP> solution;
+	static SolutionUSP solution;
 
 	public static Timetabling getTimeTabling(String args) {
 		rooms = new ArrayList<>();
@@ -47,7 +48,7 @@ public class ReadUSP {
 		courses = new ArrayList<>();
 		students = new ArrayList<>();
 		rules = new ArrayList<>();
-		solution = new ArrayList<>();
+		solution = new SolutionUSP();
 		Document document = null;
 		DocumentBuilderFactory factory = null;
 		DocumentTraversal traversal = null;
@@ -65,10 +66,10 @@ public class ReadUSP {
 			Node racine = document.getFirstChild();
 			if (racine.getNodeType() == Node.ELEMENT_NODE) {
 				Element ele = (Element) racine;
-				String name = ele.getAttribute("name");
-				String nrWeeks = ele.getAttribute("nrWeeks");
-				String nrDaysPerWeek = ele.getAttribute("nrDaysPerWeek");
-				String nrSlotsPerDay = ele.getAttribute("nrSlotsPerDay");
+				String name = ele.getAttribute(Value_USP.Attibute_Name);
+				String nrWeeks = ele.getAttribute(Value_USP.Attibute_NrWeeks);
+				String nrDaysPerWeek = ele.getAttribute(Value_USP.Attibute_NrDaysPerWeek);
+				String nrSlotsPerDay = ele.getAttribute(Value_USP.Attibute_NrSlotsPerDay);
 				timeTabling = new Timetabling(name, nrWeeks, nrDaysPerWeek, nrSlotsPerDay);
 				NodeList listes = ele.getChildNodes();
 				for (int i = 0; i < listes.getLength(); i++) {
@@ -119,6 +120,15 @@ public class ReadUSP {
 					Element e = (Element) n;
 					ArrayList<GroupSolutionUSP> groups = new ArrayList<>();
 					ArrayList<SessionSolutionUSP> sessions = new ArrayList<>();
+					NodeList group = e.getElementsByTagName(Value_USP.Groups_Group);
+					if (group != null) {
+						for (int i = 0; i < group.getLength(); i++) {
+							Node nGroup = group.item(i);
+							if (nGroup.getNodeType() == Node.ELEMENT_NODE) {
+								Element eGroup = (Element) nGroup;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -134,27 +144,29 @@ public class ReadUSP {
 					Element e = (Element) n;
 					ArrayList<SessionRuleUSP> session = new ArrayList<>();
 					ArrayList<ConstraintUSP> constraints = new ArrayList<>();
-					NodeList sessionsL = e.getElementsByTagName("sessions");
+					NodeList sessionsL = e.getElementsByTagName(Value_USP.Rule_Sessions);
 					if (sessionsL != null) {
 						for (int i = 0; i < sessionsL.getLength(); i++) {
 							Node sessionN = sessionsL.item(i);
 							if (sessionN.getNodeType() == Node.ELEMENT_NODE) {
 								Element sesEl = (Element) sessionN;
-								String groupBy = sesEl.getAttribute("groupBy");
-								String sessionMask = sesEl.getAttribute("sessionsMask");
-								String attributeName = sesEl.getAttribute("attributeName");
-								String inSes = sesEl.getAttribute("in");
+								String groupBy = sesEl.getAttribute(Value_USP.Attibute_GroupBy);
+								String sessionMask = sesEl.getAttribute(Value_USP.Attibute_SessionsMask);
+								String attributeName = sesEl.getAttribute(Value_USP.Attibute_AttributeName);
+								String inSes = sesEl.getAttribute(Value_USP.Attibute_In);
+								String notInSes = sesEl.getAttribute(Value_USP.Attibute_NotIn);
 								ArrayList<FilterUSP> filter = new ArrayList<>();
-								NodeList filterL = sesEl.getElementsByTagName("filter");
+								NodeList filterL = sesEl.getElementsByTagName(Value_USP.Sessions_Filter);
 								if (filterL != null) {
 									for (int k = 0; k < filterL.getLength(); k++) {
 										Node filterN = filterL.item(k);
 										if (filterN.getNodeType() == Node.ELEMENT_NODE) {
 											Element filterEl = (Element) filterN;
-											String type = filterEl.getAttribute("type");
-											String attributeNameFil = filterEl.getAttribute("attributeName");
-											String inF = filterEl.getAttribute("in");
-											String notIn = filterEl.getAttribute("notIn");
+											String type = filterEl.getAttribute(Value_USP.Attibute_Type);
+											String attributeNameFil = filterEl
+													.getAttribute(Value_USP.Attibute_AttributeName);
+											String inF = filterEl.getAttribute(Value_USP.Attibute_In);
+											String notIn = filterEl.getAttribute(Value_USP.Attibute_NotIn);
 											FilterUSP fil = new FilterUSP(type, attributeNameFil);
 											fil.setIn(inF);
 											fil.setNotIn(notIn);
@@ -166,27 +178,28 @@ public class ReadUSP {
 								ses.setSessionsMask(sessionMask);
 								ses.setAttributeName(attributeName);
 								ses.setIn(inSes);
+								ses.setNotIn(notInSes);
 								session.add(ses);
 							}
 						}
 					}
-					NodeList constraintsL = e.getElementsByTagName("constraint");
+					NodeList constraintsL = e.getElementsByTagName(Value_USP.Rule_Constraint);
 					if (constraintsL != null) {
 						for (int i = 0; i < constraintsL.getLength(); i++) {
 							Node constraintN = constraintsL.item(i);
 							if (constraintN.getNodeType() == Node.ELEMENT_NODE) {
 								Element constraintEl = (Element) constraintN;
-								String name = constraintEl.getAttribute("name");
-								String type = constraintEl.getAttribute("type");
+								String name = constraintEl.getAttribute(Value_USP.Attibute_Name);
+								String type = constraintEl.getAttribute(Value_USP.Attibute_Type);
 								ArrayList<ParameterUSP> parameters = new ArrayList<>();
-								NodeList paramL = constraintEl.getElementsByTagName("parameter");
+								NodeList paramL = constraintEl.getElementsByTagName(Value_USP.Prameters_Parameter);
 								if (paramL != null) {
 									for (int k = 0; k < paramL.getLength(); k++) {
 										Node paramN = paramL.item(k);
 										if (paramN.getNodeType() == Node.ELEMENT_NODE) {
 											Element paramE = (Element) paramN;
-											String typeP = paramE.getAttribute("type");
-											String nameP = paramE.getAttribute("name");
+											String typeP = paramE.getAttribute(Value_USP.Attibute_Type);
+											String nameP = paramE.getAttribute(Value_USP.Attibute_Name);
 											String value = paramE.getTextContent();
 											ParameterUSP paramU = new ParameterUSP(nameP);
 											paramU.setType(typeP);
@@ -215,15 +228,15 @@ public class ReadUSP {
 				Node n = studentS.item(j);
 				if (n.getNodeType() == Node.ELEMENT_NODE) {
 					Element e = (Element) n;
-					String id = e.getAttribute("id");
-					String label = e.getAttribute("label");
+					String id = e.getAttribute(Value_USP.Attibute_Id);
+					String label = e.getAttribute(Value_USP.Attibute_Label);
 					ArrayList<String> courses = new ArrayList<>();
-					NodeList list = e.getElementsByTagName("course");
+					NodeList list = e.getElementsByTagName(Value_USP.StudentCourses_Course);
 					for (int i = 0; i < list.getLength(); i++) {
 						Node course = list.item(i);
 						if (course.getNodeType() == Node.ELEMENT_NODE) {
 							Element courE = (Element) course;
-							String s = courE.getAttribute("refId");
+							String s = courE.getAttribute(Value_USP.Attibute_RefId);
 							courses.add(s);
 						}
 					}
@@ -252,11 +265,11 @@ public class ReadUSP {
 	}
 
 	private static CourseUSP getCourse(Element e) {
-		String idCourse = e.getAttribute("id");
-		String label = e.getAttribute("label");
+		String idCourse = e.getAttribute(Value_USP.Attibute_Id);
+		String label = e.getAttribute(Value_USP.Attibute_Label);
 		ArrayList<PartUSP> parts = new ArrayList<>();
 
-		NodeList partS = e.getElementsByTagName("part");
+		NodeList partS = e.getElementsByTagName(Value_USP.Course_Part);
 		if (partS != null) {
 			for (int j = 0; j < partS.getLength(); j++) {// pour chaque part
 				Node nPart = partS.item(j);
@@ -273,33 +286,33 @@ public class ReadUSP {
 	}
 
 	private static PartUSP getPartUSP(Element part) {
-		String idPart = part.getAttribute("id");
-		String nrSessions = part.getAttribute("nrSessions");
-		String label = part.getAttribute("label");
+		String idPart = part.getAttribute(Value_USP.Attibute_Id);
+		String nrSessions = part.getAttribute(Value_USP.Attibute_NrSessions);
+		String label = part.getAttribute(Value_USP.Attibute_Label);
 		ArrayList<ClassUSP> classes = new ArrayList<>();
 		AllowedSlotsUSP slotU = new AllowedSlotsUSP("", "", "", "");
 		AllowedRoomsUSP roomU = new AllowedRoomsUSP("", new ArrayList<>());
 		AllowedTeachersUSP teacherU = new AllowedTeachersUSP("", new ArrayList<>());
-		NodeList slotsL = part.getElementsByTagName("allowedSlots");
+		NodeList slotsL = part.getElementsByTagName(Value_USP.Part_AllowedSlots);
 		Node n = slotsL.item(0);
 		if (n.getNodeType() == Node.ELEMENT_NODE) {
 			Element slot = (Element) n;
 			slotU = getAllowedSlots(slot);
 		}
-		NodeList roomsL = part.getElementsByTagName("allowedRooms");
+		NodeList roomsL = part.getElementsByTagName(Value_USP.Part_AllowedRooms);
 		Node n1 = roomsL.item(0);
 		if (n1.getNodeType() == Node.ELEMENT_NODE) {
 			Element room = (Element) n1;
 			roomU = getAllowedRooms(room);
 		}
-		NodeList teacherL = part.getElementsByTagName("allowedTeachers");
+		NodeList teacherL = part.getElementsByTagName(Value_USP.Part_AllowedTeachers);
 		Node n2 = teacherL.item(0);
 		if (n2.getNodeType() == Node.ELEMENT_NODE) {
 			Element teacher = (Element) n2;
 			teacherU = getAllowedTeachers(teacher);
 		}
 
-		NodeList classeL = part.getElementsByTagName("class");
+		NodeList classeL = part.getElementsByTagName(Value_USP.Classes_Class);
 		for (int i = 0; i < classeL.getLength(); i++) {
 			Node clas = classeL.item(i);
 			if (clas.getNodeType() == Node.ELEMENT_NODE) {
@@ -313,16 +326,16 @@ public class ReadUSP {
 	}
 
 	private static AllowedTeachersUSP getAllowedTeachers(Element teacher) {
-		String sessionTeachers = teacher.getAttribute("sessionTeachers");
+		String sessionTeachers = teacher.getAttribute(Value_USP.Attibute_SessionTeachers);
 		ArrayList<AllowedTeacher> teacherS = new ArrayList<>();
 
-		NodeList list = teacher.getElementsByTagName("teacher");
+		NodeList list = teacher.getElementsByTagName(Value_USP.AllowedTeachers_Teacher);
 		for (int i = 0; i < list.getLength(); i++) {
 			Node teacherN = list.item(i);
 			if (teacherN.getNodeType() == Node.ELEMENT_NODE) {
 				Element ele = (Element) teacherN;
-				String ref = ele.getAttribute("refId");
-				String nrSessions = ele.getAttribute("nrSessions");
+				String ref = ele.getAttribute(Value_USP.Attibute_RefId);
+				String nrSessions = ele.getAttribute(Value_USP.Attibute_NrSessions);
 				teacherS.add(new AllowedTeacher(ref, nrSessions));
 			}
 		}
@@ -330,16 +343,16 @@ public class ReadUSP {
 	}
 
 	private static AllowedRoomsUSP getAllowedRooms(Element room) {
-		String sessionRooms = room.getAttribute("sessionRooms");
+		String sessionRooms = room.getAttribute(Value_USP.Attibute_SessionRooms);
 		ArrayList<AllowedRoomUSP> roomS = new ArrayList<>();
 
-		NodeList list = room.getElementsByTagName("room");
+		NodeList list = room.getElementsByTagName(Value_USP.AllowedRooms_Room);
 		for (int i = 0; i < list.getLength(); i++) {
 			Node roomN = list.item(i);
 			if (roomN.getNodeType() == Node.ELEMENT_NODE) {
 				Element ele = (Element) roomN;
-				String ref = ele.getAttribute("refId");
-				String mandatory = ele.getAttribute("mandatory");
+				String ref = ele.getAttribute(Value_USP.Attibute_RefId);
+				String mandatory = ele.getAttribute(Value_USP.Attibute_Mandatory);
 				roomS.add(new AllowedRoomUSP(ref, mandatory));
 			}
 		}
@@ -347,7 +360,7 @@ public class ReadUSP {
 	}
 
 	private static AllowedSlotsUSP getAllowedSlots(Element slot) {
-		String sessionLength = slot.getAttribute("sessionLength");
+		String sessionLength = slot.getAttribute(Value_USP.Attibute_SessionLength);
 		String dailySlots = "", days = "", weeks = "";
 		NodeList list = slot.getChildNodes();
 		for (int i = 0; i < list.getLength(); i++) {
@@ -372,9 +385,9 @@ public class ReadUSP {
 	}
 
 	private static ClassUSP getClassUSp(Element classe) {
-		String idClas = classe.getAttribute("id");
-		String maxHeadCount = classe.getAttribute("maxHeadCount");
-		String parent = classe.getAttribute("parent");
+		String idClas = classe.getAttribute(Value_USP.Attibute_Id);
+		String maxHeadCount = classe.getAttribute(Value_USP.Attibute_MaxHeadCount);
+		String parent = classe.getAttribute(Value_USP.Attibute_Parent);
 		ClassUSP res = new ClassUSP(idClas, maxHeadCount);
 		res.setParent(parent);
 		return res;
@@ -387,8 +400,8 @@ public class ReadUSP {
 				Node n = teacherS.item(j);
 				if (n.getNodeType() == Node.ELEMENT_NODE) {
 					Element e = (Element) n;
-					String id = e.getAttribute("id");
-					String label = e.getAttribute("label");
+					String id = e.getAttribute(Value_USP.Attibute_Id);
+					String label = e.getAttribute(Value_USP.Attibute_Label);
 
 					TeacherUSP teach = new TeacherUSP(id, label);
 					teachers.add(teach);
@@ -405,9 +418,9 @@ public class ReadUSP {
 				Node n = room.item(j);
 				if (n.getNodeType() == Node.ELEMENT_NODE) {
 					Element e = (Element) n;
-					String id = e.getAttribute("id");
-					String capacity = e.getAttribute("capacity");
-					String label = e.getAttribute("label");
+					String id = e.getAttribute(Value_USP.Attibute_Id);
+					String capacity = e.getAttribute(Value_USP.Attibute_Capacity);
+					String label = e.getAttribute(Value_USP.Attibute_Label);
 
 					RoomUSP roomU = new RoomUSP(id, capacity, label);
 					rooms.add(roomU);

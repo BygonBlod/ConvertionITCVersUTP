@@ -7,6 +7,7 @@ public class SessionRuleUSP {
 	private String sessionsMask;
 	private String attributeName;
 	private String in;
+	private String notIn;
 	private ArrayList<FilterUSP> filter;
 
 	public SessionRuleUSP(String groupBy, ArrayList<FilterUSP> filter) {
@@ -20,6 +21,14 @@ public class SessionRuleUSP {
 
 	public void setIn(String in) {
 		this.in = in;
+	}
+
+	public String getNotIn() {
+		return notIn;
+	}
+
+	public void setNotIn(String notIn) {
+		this.notIn = notIn;
 	}
 
 	public String getSessionsMask() {

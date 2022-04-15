@@ -11,6 +11,11 @@ public class SolutionUSP {
 		this.sessions = sessions;
 	}
 
+	public SolutionUSP() {
+		groups = new ArrayList<>();
+		sessions = new ArrayList<>();
+	}
+
 	public ArrayList<GroupSolutionUSP> getGroups() {
 		return groups;
 	}
