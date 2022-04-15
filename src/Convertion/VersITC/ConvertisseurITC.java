@@ -8,6 +8,7 @@ import ITC.Model.OptimizationITC;
 import ITC.Model.ProblemITC;
 import ITC.Model.RoomITC;
 import ITC.Model.StudentITC;
+import USP.Model.CourseUSP;
 import USP.Model.RoomUSP;
 import USP.Model.StudentUSP;
 import USP.Model.Timetabling;
@@ -25,6 +26,7 @@ public class ConvertisseurITC {
 
 		students = convertionStudents(students, time.getStudents());
 		rooms = convertionRooms(rooms, time.getRooms());
+		courses = convertionCourses(courses, time.getCourses());
 
 		problem.setCourses(courses);
 		problem.setDistributions(distributions);
@@ -32,6 +34,16 @@ public class ConvertisseurITC {
 		problem.setRooms(rooms);
 		problem.setStudents(students);
 		return problem;
+	}
+
+	private static ArrayList<CourseITC> convertionCourses(ArrayList<CourseITC> coursesItc,
+			ArrayList<CourseUSP> coursesUsp) {
+		for (CourseUSP course : coursesUsp) {
+			CourseITC courseI = new CourseITC(course.getId(), new ArrayList<>());
+			coursesItc.add(courseI);
+
+		}
+		return coursesItc;
 	}
 
 	private static ArrayList<RoomITC> convertionRooms(ArrayList<RoomITC> roomsItc, ArrayList<RoomUSP> roomsUsp) {
