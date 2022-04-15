@@ -112,27 +112,73 @@ public class ReadUSP {
 	}
 
 	private static void parseSolution(Element element) {
-		NodeList solutionS = element.getChildNodes();
-		if (solutionS != null) {
-			for (int j = 0; j < solutionS.getLength(); j++) {
-				Node n = solutionS.item(j);
-				if (n.getNodeType() == Node.ELEMENT_NODE) {
-					Element e = (Element) n;
-					ArrayList<GroupSolutionUSP> groups = new ArrayList<>();
-					ArrayList<SessionSolutionUSP> sessions = new ArrayList<>();
-					NodeList group = e.getElementsByTagName(Value_USP.Groups_Group);
-					if (group != null) {
-						for (int i = 0; i < group.getLength(); i++) {
-							Node nGroup = group.item(i);
-							if (nGroup.getNodeType() == Node.ELEMENT_NODE) {
-								Element eGroup = (Element) nGroup;
-							}
-						}
-					}
+
+		ArrayList<GroupSolutionUSP> groups = new ArrayList<>();
+		ArrayList<SessionSolutionUSP> sessions = new ArrayList<>();
+		NodeList group = element.getElementsByTagName(Value_USP.Groups_Group);
+		if (group != null) {
+			for (int i = 0; i < group.getLength(); i++) {
+				Node nGroup = group.item(i);
+				if (nGroup.getNodeType() == Node.ELEMENT_NODE) {
+					Element eGroup = (Element) nGroup;
+					GroupSolutionUSP groupU = getGroupUSP(eGroup);
+					groups.add(groupU);
 				}
 			}
 		}
+		NodeList session = element.getElementsByTagName(Value_USP.SolutionSessions_Session);
+		if (session != null) {
+			for (int i = 0; i < session.getLength(); i++) {
+				Node nSession = session.item(i);
+				if (nSession.getNodeType() == Node.ELEMENT_NODE) {
+					Element eSession = (Element) nSession;
+					SessionSolutionUSP sessionU = getSessionUSP(eSession);
+					sessions.add(sessionU);
+				}
+			}
+		}
+		solution.setGroups(groups);
+		solution.setSessions(sessions);
+	}
 
+	private static SessionSolutionUSP getSessionUSP(Element eSession) {
+		String clas = eSession.getAttribute(Value_USP.Attibute_Class);
+		String rank = eSession.getAttribute(Value_USP.Attibute_Rank);
+		String slot = eSession.getAttribute(Value_USP.Attibute_Slot);
+		String rooms = eSession.getAttribute(Value_USP.Attibute_Rooms);
+		String teachers = eSession.getAttribute(Value_USP.Attibute_Teachers);
+		SessionSolutionUSP res = new SessionSolutionUSP(clas, rank, slot, rooms, teachers);
+		return res;
+	}
+
+	private static GroupSolutionUSP getGroupUSP(Element eGroup) {
+		String id = eGroup.getAttribute(Value_USP.Attibute_Id);
+		String headCount = eGroup.getAttribute(Value_USP.Attibute_HeadCount);
+		ArrayList<String> students = new ArrayList<>();
+		ArrayList<String> classes = new ArrayList<>();
+		NodeList student = eGroup.getElementsByTagName(Value_USP.SolutionStudents_Student);
+		if (student != null) {
+			for (int i = 0; i < student.getLength(); i++) {
+				Node nStudent = student.item(i);
+				if (nStudent.getNodeType() == Node.ELEMENT_NODE) {
+					Element eStudent = (Element) nStudent;
+					String ref = eStudent.getAttribute(Value_USP.Attibute_RefId);
+					students.add(ref);
+				}
+			}
+		}
+		NodeList classL = eGroup.getElementsByTagName(Value_USP.SolutionClasses_Class);
+		if (classL != null) {
+			for (int i = 0; i < classL.getLength(); i++) {
+				Node nClass = classL.item(i);
+				if (nClass.getNodeType() == Node.ELEMENT_NODE) {
+					Element eClass = (Element) nClass;
+					String ref = eClass.getAttribute(Value_USP.Attibute_RefId);
+					classes.add(ref);
+				}
+			}
+		}
+		return new GroupSolutionUSP(id, headCount, students, classes);
 	}
 
 	private static void parseRules(Element element) {
