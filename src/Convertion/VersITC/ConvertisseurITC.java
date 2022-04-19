@@ -2,12 +2,21 @@ package Convertion.VersITC;
 
 import java.util.ArrayList;
 
+import ITC.Model.ClassITC;
+import ITC.Model.ClassRoomITC;
+import ITC.Model.ConfigITC;
 import ITC.Model.CourseITC;
 import ITC.Model.DistributionITC;
 import ITC.Model.OptimizationITC;
 import ITC.Model.ProblemITC;
 import ITC.Model.RoomITC;
 import ITC.Model.StudentITC;
+import ITC.Model.SubpartITC;
+import USP.Model.AllowedRoomUSP;
+import USP.Model.AllowedRoomsUSP;
+import USP.Model.ClassUSP;
+import USP.Model.CourseUSP;
+import USP.Model.PartUSP;
 import USP.Model.RoomUSP;
 import USP.Model.StudentUSP;
 import USP.Model.Timetabling;
@@ -25,6 +34,7 @@ public class ConvertisseurITC {
 
 		students = convertionStudents(students, time.getStudents());
 		rooms = convertionRooms(rooms, time.getRooms());
+		courses = convertionCourses(courses, time.getCourses());
 
 		problem.setCourses(courses);
 		problem.setDistributions(distributions);
@@ -32,6 +42,33 @@ public class ConvertisseurITC {
 		problem.setRooms(rooms);
 		problem.setStudents(students);
 		return problem;
+	}
+
+	private static ArrayList<CourseITC> convertionCourses(ArrayList<CourseITC> coursesItc,
+			ArrayList<CourseUSP> coursesUsp) {
+		for (CourseUSP course : coursesUsp) {
+			ArrayList<ConfigITC> configs = new ArrayList<>();
+			ArrayList<SubpartITC> parts = new ArrayList<>();
+			for (PartUSP part : course.getParts()) {
+				ArrayList<ClassITC> classes = new ArrayList<>();
+				for (ClassUSP classe : part.getClasses()) {
+					ArrayList<ClassRoomITC> rooms = new ArrayList<>();
+					AllowedRoomsUSP alloRooms = part.getRoom();
+					for (AllowedRoomUSP room : alloRooms.getRooms()) {
+						ClassRoomITC roomI = new ClassRoomITC(room.getRefId(), "");
+						rooms.add(roomI);
+					}
+					ClassITC classI = new ClassITC(classe.getId(), "", rooms, new ArrayList<>());
+					classes.add(classI);
+				}
+
+				parts.add(new SubpartITC(part.getId(), classes));
+			}
+			configs.add(new ConfigITC(course.getId(), parts));
+			CourseITC courseI = new CourseITC(course.getId(), configs);
+			coursesItc.add(courseI);
+		}
+		return coursesItc;
 	}
 
 	private static ArrayList<RoomITC> convertionRooms(ArrayList<RoomITC> roomsItc, ArrayList<RoomUSP> roomsUsp) {

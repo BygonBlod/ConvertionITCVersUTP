@@ -13,6 +13,13 @@ public class OptimizationITC {
 		this.student = student;
 	}
 
+	public OptimizationITC() {
+		this.time = "";
+		this.room = "";
+		this.distribution = "";
+		this.student = "";
+	}
+
 	public String getTime() {
 		return time;
 	}

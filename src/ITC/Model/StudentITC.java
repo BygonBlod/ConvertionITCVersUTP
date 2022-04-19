@@ -11,6 +11,11 @@ public class StudentITC {
 		this.courses = courses;
 	}
 
+	public StudentITC(String id2) {
+		this.id = id2;
+		this.courses = new ArrayList<>();
+	}
+
 	public String getId() {
 		return id;
 	}

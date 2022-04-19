@@ -18,17 +18,19 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ITC.Model.ClassITC;
+import ITC.Model.ClassRoomITC;
 import ITC.Model.ConfigITC;
 import ITC.Model.CourseITC;
 import ITC.Model.DistributionITC;
 import ITC.Model.OptimizationITC;
 import ITC.Model.ProblemITC;
 import ITC.Model.RoomITC;
+import ITC.Model.SolutionITC;
 import ITC.Model.StudentITC;
 import ITC.Model.SubpartITC;
 import ITC.Model.TimesITC;
 import ITC.Model.TimesPenaltyITC;
-import Utils.Pair;
+import ITC.Model.TravelITC;
 
 public class WriteITC {
 
@@ -56,6 +58,7 @@ public class WriteITC {
 			setCourses(document, racine, problem.getCourses());
 			setDistributions(document, racine, problem.getDistributions());
 			setStudents(document, racine, problem.getStudents());
+			setSolution(document, racine, problem.getSolution());
 
 			// écriture dans un fichier
 			final TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -83,6 +86,42 @@ public class WriteITC {
 			e.printStackTrace();
 		}
 
+	}
+
+	private static void setSolution(Document document, Element racine, SolutionITC solution) {
+		Element solutionE = document.createElement("solution");
+		racine.appendChild(solutionE);
+		if (!solution.getName().equals("")) {
+			solutionE.setAttribute("name", solution.getName());
+		}
+		solutionE.setAttribute("runtime", solution.getRuntime());
+		solutionE.setAttribute("cores", solution.getCores());
+		solutionE.setAttribute("technique", solution.getTechnique());
+		solutionE.setAttribute("author", solution.getAuthor());
+		solutionE.setAttribute("institution", solution.getInstitution());
+		solutionE.setAttribute("country", solution.getCountry());
+		for (ClassITC classe : solution.getClasses()) {
+			Element classE = document.createElement("class");
+			solutionE.appendChild(classE);
+			classE.setAttribute("id", classe.getId());
+			if (!classe.getDays().equals("")) {
+				classE.setAttribute("days", classe.getDays());
+			}
+			if (!classe.getStart().equals("")) {
+				classE.setAttribute("start", classe.getStart());
+			}
+			if (!classe.getWeeks().equals("")) {
+				classE.setAttribute("weeks", classe.getWeeks());
+			}
+			if (!classe.getRoom().equals("")) {
+				classE.setAttribute("room", classe.getRoom());
+			}
+			for (StudentITC student : classe.getStudents()) {
+				Element studentE = document.createElement("student");
+				classE.appendChild(studentE);
+				studentE.setAttribute("id", student.getId());
+			}
+		}
 	}
 
 	private static void setStudents(Document document, Element racine, ArrayList<StudentITC> students) {
@@ -149,11 +188,13 @@ public class WriteITC {
 						if (classe.getRooms().size() == 0) {
 							classEle.setAttribute("room", "false");
 						} else {
-							for (Pair<String, String> room : classe.getRooms()) {
+							for (ClassRoomITC room : classe.getRooms()) {
 								Element roomEle = document.createElement("room");
 								classEle.appendChild(roomEle);
-								roomEle.setAttribute("id", room.getKey());
-								roomEle.setAttribute("penalty", room.getValue());
+								roomEle.setAttribute("id", room.getId());
+								if (!room.getPenalty().equals("")) {
+									roomEle.setAttribute("penalty", room.getPenalty());
+								}
 							}
 						}
 						for (TimesPenaltyITC time : classe.getTimes()) {
@@ -180,10 +221,10 @@ public class WriteITC {
 			rooms.appendChild(roomEle);
 			roomEle.setAttribute("id", room.getId());
 			roomEle.setAttribute("capacity", room.getCapacity());
-			for (Pair<String, String> travel : room.getTravel()) {
+			for (TravelITC travel : room.getTravel()) {
 				Element travelEle = document.createElement("travel");
 				roomEle.appendChild(travelEle);
-				travelEle.setAttribute("room", travel.getKey());
+				travelEle.setAttribute("room", travel.getRoom());
 				travelEle.setAttribute("value", travel.getValue());
 			}
 			for (TimesITC time : room.getUnvailable()) {

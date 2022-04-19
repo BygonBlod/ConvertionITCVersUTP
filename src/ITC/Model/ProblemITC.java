@@ -9,8 +9,9 @@ public class ProblemITC {
 	private String nrWeeks;
 
 	private OptimizationITC optimization;
+	private SolutionITC solution;
 	// différentes listes
-	private ArrayList<RoomITC> rooms = new ArrayList<RoomITC>();
+	private ArrayList<RoomITC> rooms = new ArrayList<>();
 	private ArrayList<DistributionITC> distributions = new ArrayList<>();
 	private ArrayList<StudentITC> students = new ArrayList<>();
 	private ArrayList<CourseITC> courses = new ArrayList<>();
@@ -20,6 +21,8 @@ public class ProblemITC {
 		this.nrDays = nrDays;
 		this.slotsPerDay = slotsPerDay;
 		this.nrWeeks = nrWeeks;
+		optimization = new OptimizationITC();
+		solution = new SolutionITC();
 	}
 
 	public String getName() {
@@ -92,6 +95,14 @@ public class ProblemITC {
 
 	public void setCourses(ArrayList<CourseITC> courses) {
 		this.courses = courses;
+	}
+
+	public SolutionITC getSolution() {
+		return solution;
+	}
+
+	public void setSolution(SolutionITC solution) {
+		this.solution = solution;
 	}
 
 }
