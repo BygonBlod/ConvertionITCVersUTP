@@ -52,7 +52,6 @@ public class ConvertisseurUSP {
 			ArrayList<CourseITC> coursesItc) {
 		for (CourseITC course : coursesItc) {
 			ArrayList<PartUSP> parts = new ArrayList<>();
-			System.out.println(course.getConfig().size());
 			for (ConfigITC conf : course.getConfig()) {
 				for (SubpartITC sub : conf.getSubpart()) {
 					ArrayList<ClassUSP> classes = new ArrayList<>();
@@ -61,7 +60,6 @@ public class ConvertisseurUSP {
 						clasU.setParent(clas.getParent());
 						classes.add(clasU);
 					}
-					System.out.println("part " + classes.size());
 					PartUSP part = new PartUSP(sub.getId(), "", "", classes, new AllowedSlotsUSP("", "", "", ""),
 							new AllowedRoomsUSP("", new ArrayList<>()), new AllowedTeachersUSP("", new ArrayList<>()));
 					parts.add(part);

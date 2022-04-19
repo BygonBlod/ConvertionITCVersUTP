@@ -2,15 +2,13 @@ package ITC.Model;
 
 import java.util.ArrayList;
 
-import Utils.Pair;
-
 public class RoomITC {
 	private String id;
-	private ArrayList<Pair<String, String>> travel;
+	private ArrayList<TravelITC> travel;
 	private String capacity;
 	private ArrayList<TimesITC> unvailable;
 
-	public RoomITC(String id, ArrayList<Pair<String, String>> travel, String capacity, ArrayList<TimesITC> unvailable) {
+	public RoomITC(String id, ArrayList<TravelITC> travel, String capacity, ArrayList<TimesITC> unvailable) {
 		this.id = id;
 		this.travel = travel;
 		this.capacity = capacity;
@@ -27,11 +25,11 @@ public class RoomITC {
 		return s;
 	}
 
-	public ArrayList<Pair<String, String>> getTravel() {
+	public ArrayList<TravelITC> getTravel() {
 		return travel;
 	}
 
-	public void setTravel(ArrayList<Pair<String, String>> travel) {
+	public void setTravel(ArrayList<TravelITC> travel) {
 		this.travel = travel;
 	}
 

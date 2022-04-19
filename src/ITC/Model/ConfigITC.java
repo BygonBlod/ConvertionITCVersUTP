@@ -7,7 +7,6 @@ public class ConfigITC {
 	private ArrayList<SubpartITC> subpart;
 
 	public ConfigITC(String id, ArrayList<SubpartITC> subpart) {
-		super();
 		this.id = id;
 		this.subpart = subpart;
 	}

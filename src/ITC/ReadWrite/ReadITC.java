@@ -10,21 +10,21 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.traversal.DocumentTraversal;
-import org.w3c.dom.traversal.NodeFilter;
-import org.w3c.dom.traversal.NodeIterator;
 
 import ITC.Model.ClassITC;
+import ITC.Model.ClassRoomITC;
 import ITC.Model.ConfigITC;
 import ITC.Model.CourseITC;
 import ITC.Model.DistributionITC;
 import ITC.Model.OptimizationITC;
 import ITC.Model.ProblemITC;
 import ITC.Model.RoomITC;
+import ITC.Model.SolutionITC;
 import ITC.Model.StudentITC;
 import ITC.Model.SubpartITC;
 import ITC.Model.TimesITC;
 import ITC.Model.TimesPenaltyITC;
-import Utils.Pair;
+import ITC.Model.TravelITC;
 
 public class ReadITC {
 	static ArrayList<RoomITC> rooms = new ArrayList<RoomITC>();
@@ -53,45 +53,48 @@ public class ReadITC {
 			e.printStackTrace();
 		}
 		if (traversal != null) {
-			NodeIterator iterator = traversal.createNodeIterator(document.getDocumentElement(), NodeFilter.SHOW_ELEMENT,
-					null, true);
-			for (Node n = iterator.nextNode(); n != null; n = iterator.nextNode()) {
-				try {
-					Element element = (Element) n;
-					switch (element.getTagName()) {
-					case "rooms":
-						parseRoom(element);
-						break;
-					case "distributions":
-						parseDistribution(element);
-						break;
-					case "students":
-						parseStudent(element);
-						break;
-					case "problem":
-						String name = element.getAttribute("name");
-						String nrDays = element.getAttribute("nrDays");
-						String slotsPerDay = element.getAttribute("slotsPerDay");
-						String nrWeeks = element.getAttribute("nrWeeks");
-						problem = new ProblemITC(name, nrDays, slotsPerDay, nrWeeks);
-						break;
-					case "optimization":
-						String time = element.getAttribute("time");
-						String room = element.getAttribute("room");
-						String distribution = element.getAttribute("distribution");
-						String student = element.getAttribute("student");
-						optimization = new OptimizationITC(time, room, distribution, student);
-						break;
-					case "courses":
-						parseCourses(element);
-						break;
+			Node racine = document.getLastChild();
+			if (racine.getNodeType() == Node.ELEMENT_NODE) {
+				Element racineE = (Element) racine;
+				String name = racineE.getAttribute("name");
+				String nrDays = racineE.getAttribute("nrDays");
+				String slotsPerDay = racineE.getAttribute("slotsPerDay");
+				String nrWeeks = racineE.getAttribute("nrWeeks");
+				problem = new ProblemITC(name, nrDays, slotsPerDay, nrWeeks);
+				NodeList listRacine = racineE.getChildNodes();
+				for (int i = 0; i < listRacine.getLength(); i++) {
+					Node n = listRacine.item(i);
+					if (n.getNodeType() == Node.ELEMENT_NODE) {
+						Element element = (Element) n;
+						switch (element.getTagName()) {
+						case "rooms":
+							parseRoom(element);
+							break;
+						case "distributions":
+							parseDistribution(element);
+							break;
+						case "students":
+							parseStudent(element);
+							break;
+						case "optimization":
+							String time = element.getAttribute("time");
+							String room = element.getAttribute("room");
+							String distribution = element.getAttribute("distribution");
+							String student = element.getAttribute("student");
+							optimization = new OptimizationITC(time, room, distribution, student);
+							break;
+						case "courses":
+							parseCourses(element);
+							break;
+						case "solution":
+							parseSolution(element);
+							break;
+						}
 					}
-				} catch (Exception e) {
-					System.out.println("erreur lors de la convertion en objet:");
-					e.printStackTrace();
 				}
+			} else {
+				System.out.println("la racine n'est pas un élément");
 			}
-
 		}
 		problem.setCourses(courses);
 		problem.setDistributions(distributions);
@@ -99,6 +102,42 @@ public class ReadITC {
 		problem.setRooms(rooms);
 		problem.setStudents(students);
 		return problem;
+	}
+
+	private static void parseSolution(Element element) {
+		NodeList listClass = element.getElementsByTagName("class");
+		String name = element.getAttribute("name");
+		String runtime = element.getAttribute("runtime");
+		String cores = element.getAttribute("cores");
+		String technique = element.getAttribute("technique");
+		String author = element.getAttribute("author");
+		String institution = element.getAttribute("institution");
+		String country = element.getAttribute("country");
+		ArrayList<ClassITC> classes = new ArrayList<>();
+		for (int i = 0; i < listClass.getLength(); i++) {
+			Node n = listClass.item(i);
+			if (n.getNodeType() == Node.ELEMENT_NODE) {
+				Element classE = (Element) n;
+				String days = classE.getAttribute("days");
+				String start = classE.getAttribute("start");
+				String weeks = classE.getAttribute("weeks");
+				String room = classE.getAttribute("room");
+				ArrayList<StudentITC> students = new ArrayList<>();
+				NodeList listStudent = classE.getElementsByTagName("student");
+				for (int j = 0; j < listStudent.getLength(); j++) {
+					Node stud = listStudent.item(j);
+					if (stud.getNodeType() == Node.ELEMENT_NODE) {
+						Element studentE = (Element) stud;
+						String id = studentE.getAttribute("id");
+						StudentITC studentI = new StudentITC(id);
+						students.add(studentI);
+					}
+				}
+				classes.add(new ClassITC(country, days, start, weeks, room, students));
+			}
+		}
+		System.out.println("test avant sol");
+		problem.setSolution(new SolutionITC(name, runtime, cores, technique, author, institution, country, classes));
 	}
 
 	private static void parseCourses(Element element) {
@@ -118,16 +157,27 @@ public class ReadITC {
 	private static CourseITC getCourseITC(Element cour) {
 		String idCour = cour.getAttribute("id");
 		ArrayList<ConfigITC> configs = new ArrayList<>();
-
-		NodeList configS = cour.getChildNodes();
+		boolean multiple = false;
+		NodeList configS = cour.getElementsByTagName("config");
 		if (configS != null) {
+			if (configS.getLength() > 1) {
+				System.out.println("multiple ");
+				multiple = true;
+			}
 			for (int j = 0; j < configS.getLength(); j++) {// pour chaque config
 				Node nConfig = configS.item(j);
 				if (nConfig.getNodeType() == Node.ELEMENT_NODE) {
 					Element config = (Element) nConfig;
+					if (multiple) {
+						String id = config.getAttribute("id");
+						System.out.print(id + " ");// ici il faut écrire dans le fichier
+					}
 					ConfigITC configI = getConfigITC(config);
 					configs.add(configI);
 				}
+			}
+			if (multiple) {
+				System.out.println();
 			}
 		}
 		return new CourseITC(idCour, configs);
@@ -171,7 +221,7 @@ public class ReadITC {
 		String idCla = clas.getAttribute("id");
 		String limitCla = clas.getAttribute("limit");
 		String parentCla = clas.getAttribute("parent");
-		ArrayList<Pair<String, String>> rooms = new ArrayList<>();
+		ArrayList<ClassRoomITC> rooms = new ArrayList<>();
 		ArrayList<TimesPenaltyITC> times = new ArrayList<>();
 		NodeList roomTi = clas.getChildNodes();
 		if (roomTi != null) {
@@ -183,7 +233,7 @@ public class ReadITC {
 					case "room":
 						String idRoom = nRoomTi.getAttribute("id");
 						String penalty = nRoomTi.getAttribute("penalty");
-						rooms.add(new Pair(idRoom, penalty));
+						rooms.add(new ClassRoomITC(idRoom, penalty));
 						break;
 					case "time":
 						String days = nRoomTi.getAttribute("days");
@@ -214,7 +264,7 @@ public class ReadITC {
 					Element e = (Element) n;
 					String id = e.getAttribute("id");
 					String capacity = e.getAttribute("capacity");
-					ArrayList<Pair<String, String>> travel = new ArrayList<>();
+					ArrayList<TravelITC> travel = new ArrayList<>();
 					ArrayList<TimesITC> unavailable = new ArrayList<>();
 					NodeList child = e.getChildNodes();
 					if (child != null) {
@@ -228,7 +278,7 @@ public class ReadITC {
 									case "travel":
 										String idRoom = element.getAttribute("room");
 										String value = element.getAttribute("value");
-										travel.add(new Pair(idRoom, value));
+										travel.add(new TravelITC(idRoom, value));
 										break;
 									case "unavailable":
 										String days = element.getAttribute("days");
