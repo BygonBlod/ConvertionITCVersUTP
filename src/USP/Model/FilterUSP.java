@@ -9,6 +9,8 @@ public class FilterUSP {
 	public FilterUSP(String type, String attributeName) {
 		this.type = type;
 		this.attributeName = attributeName;
+		this.in = "";
+		this.notIn = "";
 	}
 
 	public String getType() {

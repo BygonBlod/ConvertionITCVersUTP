@@ -10,6 +10,7 @@ public class CourseUSP {
 	public CourseUSP(String id, ArrayList<PartUSP> parts) {
 		this.id = id;
 		this.parts = parts;
+		this.label = "";
 	}
 
 	public String getId() {

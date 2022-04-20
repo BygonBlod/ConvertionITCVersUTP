@@ -13,6 +13,10 @@ public class SessionRuleUSP {
 	public SessionRuleUSP(String groupBy, ArrayList<FilterUSP> filter) {
 		this.groupBy = groupBy;
 		this.filter = filter;
+		this.sessionsMask = "";
+		this.attributeName = "";
+		this.in = "";
+		this.notIn = "";
 	}
 
 	public String getIn() {

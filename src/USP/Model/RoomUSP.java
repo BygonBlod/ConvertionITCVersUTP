@@ -11,14 +11,6 @@ public class RoomUSP {
 		this.label = label;
 	}
 
-	public String toString() {
-		String s = "";
-		s += id;
-		s += " " + capacity;
-		s += " " + label;
-		return s;
-	}
-
 	public String getId() {
 		return id;
 	}

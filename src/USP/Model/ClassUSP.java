@@ -8,6 +8,7 @@ public class ClassUSP {
 	public ClassUSP(String id, String maxHeadCount) {
 		this.id = id;
 		this.maxHeadCount = maxHeadCount;
+		this.parent = "";
 	}
 
 	public String getId() {

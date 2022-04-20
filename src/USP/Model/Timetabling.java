@@ -7,11 +7,12 @@ public class Timetabling {
 	private String nrWeeks;
 	private String nrDaysPerWeek;
 	private String nrSlotsPerDay;
-	private ArrayList<RoomUSP> rooms;
-	private ArrayList<TeacherUSP> teachers;
-	private ArrayList<CourseUSP> courses;
-	private ArrayList<StudentUSP> students;
-	private ArrayList<RuleUSP> rules;
+	private ArrayList<RoomUSP> rooms = new ArrayList<>();
+	private ArrayList<TeacherUSP> teachers = new ArrayList<>();
+	private ArrayList<CourseUSP> courses = new ArrayList<>();
+	private ArrayList<StudentUSP> students = new ArrayList<>();
+	private ArrayList<RuleUSP> rules = new ArrayList<>();
+	private ArrayList<EquipmentUSP> equipments = new ArrayList<>();
 	private SolutionUSP solution;
 
 	public Timetabling(String name, String nrWeeks, String nrDaysPerWeek, String nrSlotsPerDay) {
@@ -19,6 +20,7 @@ public class Timetabling {
 		this.nrWeeks = nrWeeks;
 		this.nrDaysPerWeek = nrDaysPerWeek;
 		this.nrSlotsPerDay = nrSlotsPerDay;
+		this.solution = new SolutionUSP();
 	}
 
 	public String getName() {
@@ -91,6 +93,14 @@ public class Timetabling {
 
 	public void setRules(ArrayList<RuleUSP> rules) {
 		this.rules = rules;
+	}
+
+	public ArrayList<EquipmentUSP> getEquipments() {
+		return equipments;
+	}
+
+	public void setEquipments(ArrayList<EquipmentUSP> equipments) {
+		this.equipments = equipments;
 	}
 
 	public SolutionUSP getSolution() {

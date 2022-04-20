@@ -7,6 +7,8 @@ public class ParameterUSP {
 
 	public ParameterUSP(String name) {
 		this.name = name;
+		this.type = "";
+		this.value = "";
 	}
 
 	public String getName() {
