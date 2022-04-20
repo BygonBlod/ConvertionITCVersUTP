@@ -1,5 +1,11 @@
 package ITC.ReadWrite;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -33,8 +39,15 @@ public class ReadITC {
 	static ArrayList<CourseITC> courses = new ArrayList<>();
 	static ProblemITC problem;
 	static OptimizationITC optimization;
+	static boolean ajout = false;
+	static String filename;
+	public static int nbFile = 0;
+	static ArrayList<String> lignes;
 
-	public static ProblemITC getProblem(String args) {
+	public static ProblemITC getProblem(String args, boolean mul) {
+		filename = args;
+		ajout = false;
+		lignes = new ArrayList<>();
 		rooms = new ArrayList<>();
 		distributions = new ArrayList<>();
 		students = new ArrayList<>();
@@ -101,6 +114,17 @@ public class ReadITC {
 		problem.setOptimization(optimization);
 		problem.setRooms(rooms);
 		problem.setStudents(students);
+		if (mul && ajout) {
+			Path fichier = Paths.get("multipleConfig.txt");
+			try {
+				lignes.add(0, filename);
+				lignes.add("\n");
+				Files.write(fichier, lignes, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
+				nbFile++;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		return problem;
 	}
 
@@ -136,7 +160,6 @@ public class ReadITC {
 				classes.add(new ClassITC(country, days, start, weeks, room, students));
 			}
 		}
-		System.out.println("test avant sol");
 		problem.setSolution(new SolutionITC(name, runtime, cores, technique, author, institution, country, classes));
 	}
 
@@ -161,8 +184,8 @@ public class ReadITC {
 		NodeList configS = cour.getElementsByTagName("config");
 		if (configS != null) {
 			if (configS.getLength() > 1) {
-				System.out.println("multiple ");
 				multiple = true;
+				ajout = true;
 			}
 			for (int j = 0; j < configS.getLength(); j++) {// pour chaque config
 				Node nConfig = configS.item(j);
@@ -170,14 +193,11 @@ public class ReadITC {
 					Element config = (Element) nConfig;
 					if (multiple) {
 						String id = config.getAttribute("id");
-						System.out.print(id + " ");// ici il faut écrire dans le fichier
+						lignes.add(id);
 					}
 					ConfigITC configI = getConfigITC(config);
 					configs.add(configI);
 				}
-			}
-			if (multiple) {
-				System.out.println();
 			}
 		}
 		return new CourseITC(idCour, configs);
