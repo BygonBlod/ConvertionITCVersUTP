@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import ITC.Model.ClassITC;
 import ITC.Model.ConfigITC;
 import ITC.Model.CourseITC;
+import ITC.Model.DistributionITC;
 import ITC.Model.ProblemITC;
 import ITC.Model.RoomITC;
 import ITC.Model.StudentITC;
@@ -13,10 +14,13 @@ import USP.Model.AllowedRoomsUSP;
 import USP.Model.AllowedSlotsUSP;
 import USP.Model.AllowedTeachersUSP;
 import USP.Model.ClassUSP;
+import USP.Model.ConstraintUSP;
 import USP.Model.CourseUSP;
+import USP.Model.FilterUSP;
 import USP.Model.PartUSP;
 import USP.Model.RoomUSP;
 import USP.Model.RuleUSP;
+import USP.Model.SessionRuleUSP;
 import USP.Model.SolutionUSP;
 import USP.Model.StudentUSP;
 import USP.Model.TeacherUSP;
@@ -36,6 +40,7 @@ public class ConvertisseurUSP {
 		rooms = convertionRooms(rooms, problem.getRooms());
 		courses = convertionCourses(courses, problem.getCourses());
 		solution = new SolutionUSP();
+		rules = convertionDistibution(rules, problem.getDistributions());
 
 		Timetabling time = new Timetabling(problem.getName(), problem.getNrWeeks(), problem.getNrDays(),
 				problem.getSlotsPerDay());
@@ -46,6 +51,33 @@ public class ConvertisseurUSP {
 		time.setStudents(students);
 		time.setTeachers(teachers);
 		return time;
+	}
+
+	private static ArrayList<RuleUSP> convertionDistibution(ArrayList<RuleUSP> rules,
+			ArrayList<DistributionITC> distributions) {
+		for (DistributionITC distrib : distributions) {
+			if (distrib.getType().equals("SameAttendees") && distrib.getRequired().equals("true")) {
+				String s = "";
+				for (String classe : distrib.getClassId()) {
+					s += classe + ",";
+				}
+				s = s.substring(0, s.length() - 1);
+				ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
+				ArrayList<ConstraintUSP> constraints = new ArrayList<>();
+				ArrayList<FilterUSP> filters = new ArrayList<>();
+				FilterUSP filter = new FilterUSP("class", "id");
+				filter.setIn(s);
+				filters.add(filter);
+				SessionRuleUSP session = new SessionRuleUSP("courses", filters);
+				sessions.add(session);
+				ConstraintUSP cons = new ConstraintUSP("disjunctive", "hard", new ArrayList<>());
+				constraints.add(cons);
+				RuleUSP rule = new RuleUSP(sessions, constraints);
+				rules.add(rule);
+			}
+		}
+
+		return rules;
 	}
 
 	private static ArrayList<CourseUSP> convertionCourses(ArrayList<CourseUSP> coursesUsp,

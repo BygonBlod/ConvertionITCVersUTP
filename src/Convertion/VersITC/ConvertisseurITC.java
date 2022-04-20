@@ -59,6 +59,7 @@ public class ConvertisseurITC {
 						rooms.add(roomI);
 					}
 					ClassITC classI = new ClassITC(classe.getId(), "", rooms, new ArrayList<>());
+					classI.setParent(classe.getParent());
 					classes.add(classI);
 				}
 
