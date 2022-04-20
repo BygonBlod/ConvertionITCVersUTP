@@ -11,6 +11,8 @@ public class DistributionITC {
 	public DistributionITC(String type, ArrayList<String> classId) {
 		this.type = type;
 		this.classId = classId;
+		this.required = "";
+		this.penalty = "";
 	}
 
 	public String getType() {

@@ -15,16 +15,6 @@ public class RoomITC {
 		this.unvailable = unvailable;
 	}
 
-	public String toString() {
-		String s = "";
-		s += "id: " + id;
-		s += " cap: " + capacity;
-		s += " travel :" + travel.toString();
-		s += " unavailable:" + unvailable.toString();
-		s += "\n";
-		return s;
-	}
-
 	public ArrayList<TravelITC> getTravel() {
 		return travel;
 	}

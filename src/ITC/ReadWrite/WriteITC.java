@@ -147,10 +147,12 @@ public class WriteITC {
 			Element distri = document.createElement("distribution");
 			dist.appendChild(distri);
 			distri.setAttribute("type", distrib.getType());
-			if (distrib.getRequired() != null) {
+			if (!distrib.getRequired().equals("")) {
 				distri.setAttribute("required", distrib.getRequired());
+			} else {
+				distri.setAttribute("required", "false");
 			}
-			if (distrib.getPenalty() != null) {
+			if (!distrib.getPenalty().equals("")) {
 				distri.setAttribute("penalty", distrib.getPenalty());
 			}
 			for (String s : distrib.getClassId()) {
@@ -181,22 +183,34 @@ public class WriteITC {
 						Element classEle = document.createElement("class");
 						subEle.appendChild(classEle);
 						classEle.setAttribute("id", classe.getId());
-						classEle.setAttribute("limit", classe.getLimit());
-						if (classe.getParent() != null) {
+						if (!classe.getLimit().equals("")) {
+							classEle.setAttribute("limit", classe.getLimit());
+						}
+						if (!classe.getParent().equals("")) {
 							classEle.setAttribute("parent", classe.getParent());
 						}
-						if (classe.getRooms().size() == 0) {
-							classEle.setAttribute("room", "false");
-						} else {
-							for (ClassRoomITC room : classe.getRooms()) {
-								Element roomEle = document.createElement("room");
-								classEle.appendChild(roomEle);
-								roomEle.setAttribute("id", room.getId());
-								if (!room.getPenalty().equals("")) {
-									roomEle.setAttribute("penalty", room.getPenalty());
-								}
+						if (!classe.getRoom().equals("")) {
+							classEle.setAttribute("room", classe.getRoom());
+						}
+						if (!classe.getDays().equals("")) {
+							classEle.setAttribute("days", classe.getDays());
+						}
+						if (!classe.getStart().equals("")) {
+							classEle.setAttribute("start", classe.getStart());
+						}
+						if (!classe.getWeeks().equals("")) {
+							classEle.setAttribute("weeks", classe.getWeeks());
+						}
+
+						for (ClassRoomITC room : classe.getRooms()) {
+							Element roomEle = document.createElement("room");
+							classEle.appendChild(roomEle);
+							roomEle.setAttribute("id", room.getId());
+							if (!room.getPenalty().equals("")) {
+								roomEle.setAttribute("penalty", room.getPenalty());
 							}
 						}
+
 						for (TimesPenaltyITC time : classe.getTimes()) {
 							Element timeEle = document.createElement("time");
 							classEle.appendChild(timeEle);
@@ -204,7 +218,9 @@ public class WriteITC {
 							timeEle.setAttribute("start", time.getStart());
 							timeEle.setAttribute("length", time.getLength());
 							timeEle.setAttribute("weeks", time.getWeeks());
-							timeEle.setAttribute("penalty", time.getPenalty());
+							if (!time.getPenalty().equals("")) {
+								timeEle.setAttribute("penalty", time.getPenalty());
+							}
 						}
 					}
 				}
@@ -220,7 +236,9 @@ public class WriteITC {
 			Element roomEle = document.createElement("room");
 			rooms.appendChild(roomEle);
 			roomEle.setAttribute("id", room.getId());
-			roomEle.setAttribute("capacity", room.getCapacity());
+			if (!room.getCapacity().equals("")) {
+				roomEle.setAttribute("capacity", room.getCapacity());
+			}
 			for (TravelITC travel : room.getTravel()) {
 				Element travelEle = document.createElement("travel");
 				roomEle.appendChild(travelEle);

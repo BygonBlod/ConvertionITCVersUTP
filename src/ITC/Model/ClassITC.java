@@ -17,17 +17,26 @@ public class ClassITC {
 	public ClassITC(String id, String limit, ArrayList<ClassRoomITC> rooms, ArrayList<TimesPenaltyITC> times) {
 		this.id = id;
 		this.limit = limit;
+		this.parent = "";
+		this.days = "";
+		this.start = "";
+		this.weeks = "";
+		this.room = "";
 		this.rooms = rooms;
 		this.times = times;
+		this.students = new ArrayList<>();
 	}
 
 	public ClassITC(String id, String days, String start, String weeks, String room, ArrayList<StudentITC> students) {
 		this.id = id;
+		this.limit = "";
 		this.days = days;
 		this.start = start;
 		this.weeks = weeks;
 		this.room = room;
 		this.students = students;
+		this.rooms = new ArrayList<>();
+		this.times = new ArrayList<>();
 	}
 
 	public String getId() {

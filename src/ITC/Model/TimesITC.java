@@ -13,16 +13,6 @@ public class TimesITC {
 		this.weeks = weeks;
 	}
 
-	public String toString() {
-		String s = "";
-		s += "days: " + days;
-		s += " weeks: " + weeks;
-		s += " start:" + start;
-		s += " length:" + length;
-		s += "\n";
-		return s;
-	}
-
 	public String getDays() {
 		return days;
 	}
