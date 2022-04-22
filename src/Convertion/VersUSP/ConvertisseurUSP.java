@@ -3,6 +3,7 @@ package Convertion.VersUSP;
 import java.util.ArrayList;
 
 import ITC.Model.ClassITC;
+import ITC.Model.ClassRoomITC;
 import ITC.Model.ConfigITC;
 import ITC.Model.CourseITC;
 import ITC.Model.DistributionITC;
@@ -10,11 +11,13 @@ import ITC.Model.ProblemITC;
 import ITC.Model.RoomITC;
 import ITC.Model.StudentITC;
 import ITC.Model.SubpartITC;
+import USP.Model.AllowedRoomUSP;
 import USP.Model.AllowedRoomsUSP;
 import USP.Model.AllowedSlotsUSP;
 import USP.Model.AllowedTeachersUSP;
 import USP.Model.ClassUSP;
 import USP.Model.ConstraintUSP;
+import USP.Model.ConstraintsUSP;
 import USP.Model.CourseUSP;
 import USP.Model.FilterUSP;
 import USP.Model.PartUSP;
@@ -27,8 +30,12 @@ import USP.Model.TeacherUSP;
 import USP.Model.Timetabling;
 
 public class ConvertisseurUSP {
+	private static boolean unionroom = false;
+	private static boolean multipleConfig = false;
 
-	public static Timetabling getTimeTabling(ProblemITC problem) {
+	public static Timetabling getTimeTabling(ProblemITC problem, boolean unionR, boolean multiple) {
+		unionroom = unionR;
+		multipleConfig = multiple;
 		ArrayList<RoomUSP> rooms = new ArrayList<>();
 		ArrayList<TeacherUSP> teachers = new ArrayList<>();
 		ArrayList<CourseUSP> courses = new ArrayList<>();
@@ -63,7 +70,7 @@ public class ConvertisseurUSP {
 				}
 				s = s.substring(0, s.length() - 1);
 				ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
-				ArrayList<ConstraintUSP> constraints = new ArrayList<>();
+				ConstraintsUSP constraints = new ConstraintsUSP();
 				ArrayList<FilterUSP> filters = new ArrayList<>();
 				FilterUSP filter = new FilterUSP("class", "id");
 				filter.setIn(s);
@@ -84,23 +91,59 @@ public class ConvertisseurUSP {
 			ArrayList<CourseITC> coursesItc) {
 		for (CourseITC course : coursesItc) {
 			ArrayList<PartUSP> parts = new ArrayList<>();
-			for (ConfigITC conf : course.getConfig()) {
-				for (SubpartITC sub : conf.getSubpart()) {
-					ArrayList<ClassUSP> classes = new ArrayList<>();
-					for (ClassITC clas : sub.getClas()) {
-						ClassUSP clasU = new ClassUSP(clas.getId(), "");
-						clasU.setParent(clas.getParent());
-						classes.add(clasU);
+			if (course.getConfig().size() == 1 || multipleConfig) {
+				for (ConfigITC conf : course.getConfig()) {
+					for (SubpartITC sub : conf.getSubpart()) {
+						ArrayList<ClassUSP> classes = new ArrayList<>();
+						for (ClassITC clas : sub.getClas()) {
+							ClassUSP clasU = new ClassUSP(clas.getId(), "");
+							clasU.setParent(clas.getParent());
+							classes.add(clasU);
+						}
+						AllowedRoomsUSP rooms = getAllowedRooms(sub.getClas());
+						PartUSP part = new PartUSP(sub.getId(), "", "", classes, new AllowedSlotsUSP("0", "", "", ""),
+								rooms, new AllowedTeachersUSP("0", new ArrayList<>()));
+						parts.add(part);
 					}
-					PartUSP part = new PartUSP(sub.getId(), "", "", classes, new AllowedSlotsUSP("", "", "", ""),
-							new AllowedRoomsUSP("", new ArrayList<>()), new AllowedTeachersUSP("", new ArrayList<>()));
-					parts.add(part);
 				}
 			}
 			CourseUSP courseU = new CourseUSP(course.getId(), parts);
 			coursesUsp.add(courseU);
 		}
 		return coursesUsp;
+	}
+
+	private static AllowedRoomsUSP getAllowedRooms(ArrayList<ClassITC> clas) {
+		AllowedRoomsUSP rooms = new AllowedRoomsUSP("none");
+		for (ClassITC classe : clas) {
+			if (unionroom) {
+				for (ClassRoomITC room : classe.getRooms()) {
+					if (!rooms.containsRoom(room.getId())) {
+						AllowedRoomUSP roomU = new AllowedRoomUSP(room.getId(), "");
+						rooms.add(roomU);
+					}
+				}
+			} else {
+				rooms = intersection(rooms, classe.getRooms());
+			}
+		}
+		return rooms;
+	}
+
+	private static AllowedRoomsUSP intersection(AllowedRoomsUSP rooms, ArrayList<ClassRoomITC> roomsITC) {
+		AllowedRoomsUSP res = new AllowedRoomsUSP(rooms.getSessionRooms());
+		if (rooms.size() == 0) {
+			for (ClassRoomITC roomI : roomsITC) {
+				res.add(new AllowedRoomUSP(roomI.getId(), ""));
+			}
+		} else {
+			for (ClassRoomITC roomI : roomsITC) {
+				if (rooms.containsRoom(roomI.getId())) {
+					res.add(new AllowedRoomUSP(roomI.getId(), ""));
+				}
+			}
+		}
+		return res;
 	}
 
 	private static ArrayList<RoomUSP> convertionRooms(ArrayList<RoomUSP> roomsUsp, ArrayList<RoomITC> roomsItc) {
