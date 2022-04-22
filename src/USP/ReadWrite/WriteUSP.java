@@ -251,7 +251,7 @@ public class WriteUSP {
 				Element roomsE = document.createElement(Value_USP.Part_AllowedRooms);
 				partE.appendChild(roomsE);
 				roomsE.setAttribute(Value_USP.Attibute_SessionRooms, rooms.getSessionRooms());
-				for (AllowedRoomUSP room : rooms.getRooms()) {
+				for (AllowedRoomUSP room : rooms) {
 					Element roomE = document.createElement(Value_USP.AllowedRooms_Room);
 					roomsE.appendChild(roomE);
 					roomE.setAttribute(Value_USP.Attibute_RefId, room.getRefId());
