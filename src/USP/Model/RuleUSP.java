@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 public class RuleUSP {
 	private ArrayList<SessionRuleUSP> sessions;
-	private ArrayList<ConstraintUSP> constraint;
+	private ConstraintsUSP constraint;
 
-	public RuleUSP(ArrayList<SessionRuleUSP> sessions, ArrayList<ConstraintUSP> constraint) {
+	public RuleUSP(ArrayList<SessionRuleUSP> sessions, ConstraintsUSP constraint) {
 		this.sessions = sessions;
 		this.constraint = constraint;
 	}
@@ -19,11 +19,11 @@ public class RuleUSP {
 		this.sessions = sessions;
 	}
 
-	public ArrayList<ConstraintUSP> getConstraint() {
+	public ConstraintsUSP getConstraint() {
 		return constraint;
 	}
 
-	public void setConstraint(ArrayList<ConstraintUSP> constraint) {
+	public void setConstraint(ConstraintsUSP constraint) {
 		this.constraint = constraint;
 	}
 

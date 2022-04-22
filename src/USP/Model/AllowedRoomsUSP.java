@@ -2,13 +2,11 @@ package USP.Model;
 
 import java.util.ArrayList;
 
-public class AllowedRoomsUSP {
+public class AllowedRoomsUSP extends ArrayList<AllowedRoomUSP> {
 	private String sessionRooms;
-	private ArrayList<AllowedRoomUSP> rooms;
 
-	public AllowedRoomsUSP(String sessionRooms, ArrayList<AllowedRoomUSP> rooms) {
+	public AllowedRoomsUSP(String sessionRooms) {
 		this.sessionRooms = sessionRooms;
-		this.rooms = rooms;
 	}
 
 	public String getSessionRooms() {
@@ -19,12 +17,13 @@ public class AllowedRoomsUSP {
 		this.sessionRooms = sessionRooms;
 	}
 
-	public ArrayList<AllowedRoomUSP> getRooms() {
-		return rooms;
-	}
-
-	public void setRooms(ArrayList<AllowedRoomUSP> rooms) {
-		this.rooms = rooms;
+	public boolean containsRoom(String id) {
+		for (AllowedRoomUSP room : this) {
+			if (room.getRefId().equals(id)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

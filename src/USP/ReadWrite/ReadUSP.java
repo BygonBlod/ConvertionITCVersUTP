@@ -18,6 +18,7 @@ import USP.Model.AllowedTeacher;
 import USP.Model.AllowedTeachersUSP;
 import USP.Model.ClassUSP;
 import USP.Model.ConstraintUSP;
+import USP.Model.ConstraintsUSP;
 import USP.Model.CourseUSP;
 import USP.Model.FilterUSP;
 import USP.Model.GroupSolutionUSP;
@@ -164,7 +165,7 @@ public class ReadUSP {
 		ArrayList<Element> ruleL = UtilParse.getElements(ruleN);
 		for (Element ruleE : ruleL) {
 			ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
-			ArrayList<ConstraintUSP> constraints = new ArrayList<>();
+			ConstraintsUSP constraints = new ConstraintsUSP();
 			NodeList sessionsN = ruleE.getElementsByTagName(Value_USP.Rule_Sessions);
 			ArrayList<Element> sessionL = UtilParse.getElements(sessionsN);
 			for (Element sessionE : sessionL) {
@@ -267,7 +268,7 @@ public class ReadUSP {
 		String label = part.getAttribute(Value_USP.Attibute_Label);
 		ArrayList<ClassUSP> classes = new ArrayList<>();
 		AllowedSlotsUSP slotU = new AllowedSlotsUSP("", "", "", "");
-		AllowedRoomsUSP roomU = new AllowedRoomsUSP("", new ArrayList<>());
+		AllowedRoomsUSP roomU = new AllowedRoomsUSP("");
 		AllowedTeachersUSP teacherU = new AllowedTeachersUSP("", new ArrayList<>());
 		NodeList slotsL = part.getElementsByTagName(Value_USP.Part_AllowedSlots);
 		Node n = slotsL.item(0);
@@ -310,7 +311,7 @@ public class ReadUSP {
 
 	private static AllowedRoomsUSP getAllowedRooms(Element room) {
 		String sessionRooms = room.getAttribute(Value_USP.Attibute_SessionRooms);
-		ArrayList<AllowedRoomUSP> roomS = new ArrayList<>();
+		AllowedRoomsUSP roomS = new AllowedRoomsUSP(sessionRooms);
 
 		NodeList roomN = room.getElementsByTagName(Value_USP.AllowedRooms_Room);
 		ArrayList<Element> roomL = UtilParse.getElements(roomN);
@@ -319,7 +320,7 @@ public class ReadUSP {
 			String mandatory = roomE.getAttribute(Value_USP.Attibute_Mandatory);
 			roomS.add(new AllowedRoomUSP(ref, mandatory));
 		}
-		return new AllowedRoomsUSP(sessionRooms, roomS);
+		return roomS;
 	}
 
 	private static AllowedSlotsUSP getAllowedSlots(Element slot) {
