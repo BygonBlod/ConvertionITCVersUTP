@@ -16,8 +16,11 @@ import USP.Model.AllowedRoomUSP;
 import USP.Model.AllowedRoomsUSP;
 import USP.Model.ClassUSP;
 import USP.Model.CourseUSP;
+import USP.Model.FilterUSP;
 import USP.Model.PartUSP;
 import USP.Model.RoomUSP;
+import USP.Model.RuleUSP;
+import USP.Model.SessionRuleUSP;
 import USP.Model.StudentUSP;
 import USP.Model.Timetabling;
 
@@ -35,6 +38,7 @@ public class ConvertisseurITC {
 		students = convertionStudents(students, time.getStudents());
 		rooms = convertionRooms(rooms, time.getRooms());
 		courses = convertionCourses(courses, time.getCourses());
+		distributions = convertionDistribution(distributions, time.getRules());
 
 		problem.setCourses(courses);
 		problem.setDistributions(distributions);
@@ -42,6 +46,33 @@ public class ConvertisseurITC {
 		problem.setRooms(rooms);
 		problem.setStudents(students);
 		return problem;
+	}
+
+	private static ArrayList<DistributionITC> convertionDistribution(ArrayList<DistributionITC> distributions,
+			ArrayList<RuleUSP> rules) {
+		for (RuleUSP rule : rules) {
+			ArrayList<String> classes = new ArrayList<>();
+			if (rule.getConstraint().containsCons("disjunctive", "hard")) {
+				for (SessionRuleUSP session : rule.getSessions()) {
+					if (session.getGroupBy().equals("courses")) {
+						for (FilterUSP filter : session.getFilter()) {
+							if (filter.getAttributeName().equals("id") && filter.getType().equals("class")) {
+								String s = filter.getIn();
+								String[] decoupe = s.split(",");
+								for (int i = 0; i < decoupe.length; i++) {
+									classes.add(decoupe[i]);
+								}
+							}
+						}
+					}
+				}
+				DistributionITC distribution = new DistributionITC("SameAttendees", classes);
+				distribution.setRequired("true");
+				distributions.add(distribution);
+			}
+		}
+
+		return distributions;
 	}
 
 	private static ArrayList<CourseITC> convertionCourses(ArrayList<CourseITC> coursesItc,
@@ -54,7 +85,7 @@ public class ConvertisseurITC {
 				for (ClassUSP classe : part.getClasses()) {
 					ArrayList<ClassRoomITC> rooms = new ArrayList<>();
 					AllowedRoomsUSP alloRooms = part.getRoom();
-					for (AllowedRoomUSP room : alloRooms.getRooms()) {
+					for (AllowedRoomUSP room : alloRooms) {
 						ClassRoomITC roomI = new ClassRoomITC(room.getRefId(), "");
 						rooms.add(roomI);
 					}
