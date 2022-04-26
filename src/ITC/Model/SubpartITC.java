@@ -11,6 +11,18 @@ public class SubpartITC {
 		this.clas = clas;
 	}
 
+	public TimesPenaltysITC getAllTimes() {
+		TimesPenaltysITC res = new TimesPenaltysITC();
+		for (ClassITC classe : clas) {
+			for (TimesPenaltyITC time : classe.getTimes()) {
+				if (!res.containsTime4(time.getDays(), time.getWeeks(), time.getStart(), time.getLength())) {
+					res.add(time);
+				}
+			}
+		}
+		return res;
+	}
+
 	public String getId() {
 		return id;
 	}

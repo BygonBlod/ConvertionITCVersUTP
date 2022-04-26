@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import ITC.Model.ClassITC;
 import ITC.Model.ClassRoomITC;
+import ITC.Model.ClassRoomsITC;
 import ITC.Model.ConfigITC;
 import ITC.Model.CourseITC;
 import ITC.Model.DistributionITC;
@@ -12,6 +13,7 @@ import ITC.Model.ProblemITC;
 import ITC.Model.RoomITC;
 import ITC.Model.StudentITC;
 import ITC.Model.SubpartITC;
+import ITC.Model.TimesPenaltysITC;
 import USP.Model.AllowedRoomUSP;
 import USP.Model.AllowedRoomsUSP;
 import USP.Model.ClassUSP;
@@ -83,13 +85,14 @@ public class ConvertisseurITC {
 			for (PartUSP part : course.getParts()) {
 				ArrayList<ClassITC> classes = new ArrayList<>();
 				for (ClassUSP classe : part.getClasses()) {
-					ArrayList<ClassRoomITC> rooms = new ArrayList<>();
+					ClassRoomsITC rooms = new ClassRoomsITC();
 					AllowedRoomsUSP alloRooms = part.getRoom();
 					for (AllowedRoomUSP room : alloRooms) {
 						ClassRoomITC roomI = new ClassRoomITC(room.getRefId(), "");
 						rooms.add(roomI);
 					}
-					ClassITC classI = new ClassITC(classe.getId(), "", rooms, new ArrayList<>());
+					ClassITC classI = new ClassITC(classe.getId(), classe.getMaxHeadCount(), rooms,
+							new TimesPenaltysITC());
 					classI.setParent(classe.getParent());
 					classes.add(classI);
 				}

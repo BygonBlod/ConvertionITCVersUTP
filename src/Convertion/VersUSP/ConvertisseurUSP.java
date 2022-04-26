@@ -92,28 +92,39 @@ public class ConvertisseurUSP {
 	private static ArrayList<CourseUSP> convertionCourses(ArrayList<CourseUSP> coursesUsp,
 			ArrayList<CourseITC> coursesItc) {
 		for (CourseITC course : coursesItc) {
-			ArrayList<PartUSP> parts = new ArrayList<>();
-			// if (course.getConfig().size() == 1 || multipleConfig) {
-			for (ConfigITC conf : course.getConfig()) {
-				for (SubpartITC sub : conf.getSubpart()) {
-					ArrayList<ClassUSP> classes = new ArrayList<>();
-					for (ClassITC clas : sub.getClas()) {
-						ClassUSP clasU = new ClassUSP(clas.getId(), clas.getLimit());
-						clasU.setParent(clas.getParent());
-						classes.add(clasU);
+			if (course.getConfig().size() == 1 || course.differentTimes4()) {
+				int i = 0;
+				for (ConfigITC conf : course.getConfig()) {
+					ArrayList<PartUSP> parts = new ArrayList<>();
+					for (SubpartITC sub : conf.getSubpart()) {
+						ArrayList<ClassUSP> classes = new ArrayList<>();
+						for (ClassITC clas : sub.getClas()) {
+							ClassUSP clasU = new ClassUSP(clas.getId(), clas.getLimit());
+							clasU.setParent(clas.getParent());
+							classes.add(clasU);
+						}
+						AllowedRoomsUSP rooms = getAllowedRooms(sub.getClas());
+						AllowedSlotsUSP slots = getAllowedSlots(sub);
+						PartUSP part = new PartUSP(sub.getId(), "", "", classes, slots, rooms,
+								new AllowedTeachersUSP("0", new ArrayList<>()));
+						parts.add(part);
 					}
-					AllowedRoomsUSP rooms = getAllowedRooms(sub.getClas());
-					AllowedSlotsUSP slots = getAllowedSlots(sub);
-					PartUSP part = new PartUSP(sub.getId(), "", "", classes, slots, rooms,
-							new AllowedTeachersUSP("0", new ArrayList<>()));
-					parts.add(part);
+					if (course.getConfig().size() > 1) {
+						CourseUSP courseU = new CourseUSP(course.getId() + "-" + i, parts);
+						coursesUsp.add(courseU);
+					} else {
+						CourseUSP courseU = new CourseUSP(course.getId(), parts);
+						coursesUsp.add(courseU);
+					}
+					i++;
 				}
+			} else {
+				System.out.println("non de non");
 			}
-			// }
-			CourseUSP courseU = new CourseUSP(course.getId(), parts);
-			coursesUsp.add(courseU);
+
 		}
 		return coursesUsp;
+
 	}
 
 	private static AllowedSlotsUSP getAllowedSlots(SubpartITC sub) {
@@ -146,7 +157,7 @@ public class ConvertisseurUSP {
 				session.setAttributeName("id");
 				session.setIn(classe.getId());
 				sessions.add(session);
-				ConstraintUSP cons = new ConstraintUSP("forbidenRooms", "hard", new ArrayList<>());
+				ConstraintUSP cons = new ConstraintUSP("forbiddenRooms", "hard", new ArrayList<>());
 				constraints.add(cons);
 				RuleUSP rule = new RuleUSP(sessions, constraints);
 				rules.add(rule);
@@ -163,11 +174,9 @@ public class ConvertisseurUSP {
 					res2 += roomI.getRefId() + ",";
 				}
 			}
-			System.out.println("avant :" + res2 + "/");
 			if (!res2.equals("")) {
-				res2.substring(0, res2.length() - 1);
+				res2 = res2.substring(0, res2.length() - 1);
 			}
-			System.out.println("après :" + res2 + "/");
 		}
 		return res2;
 	}

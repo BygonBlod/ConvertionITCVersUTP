@@ -11,6 +11,28 @@ public class CourseITC {
 		this.config = config;
 	}
 
+	public boolean differentTimes4() {
+		TimesPenaltysITC times = new TimesPenaltysITC();
+		for (ConfigITC conf : config) {
+			if (times.size() == 0) {
+				times = conf.getAllTimes();
+			} else {
+				for (TimesPenaltyITC time : conf.getAllTimes()) {
+					if (!times.containsTime4(time.getDays(), time.getWeeks(), time.getStart(), time.getLength())) {
+						return true;
+					}
+				}
+				for (TimesPenaltyITC time : times) {
+					if (!conf.getAllTimes().containsTime4(time.getDays(), time.getWeeks(), time.getStart(),
+							time.getLength())) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	public String getId() {
 		return id;
 	}
