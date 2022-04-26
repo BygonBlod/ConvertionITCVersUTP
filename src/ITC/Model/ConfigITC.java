@@ -11,6 +11,18 @@ public class ConfigITC {
 		this.subpart = subpart;
 	}
 
+	public TimesPenaltysITC getAllTimes() {
+		TimesPenaltysITC res = new TimesPenaltysITC();
+		for (SubpartITC sub : subpart) {
+			for (TimesPenaltyITC time : sub.getAllTimes()) {
+				if (!res.containsTime4(time.getDays(), time.getWeeks(), time.getStart(), time.getLength())) {
+					res.add(time);
+				}
+			}
+		}
+		return res;
+	}
+
 	public String getId() {
 		return id;
 	}

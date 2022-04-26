@@ -31,6 +31,7 @@ import ITC.Model.StudentITC;
 import ITC.Model.SubpartITC;
 import ITC.Model.TimesITC;
 import ITC.Model.TimesPenaltyITC;
+import ITC.Model.TimesPenaltysITC;
 import ITC.Model.TravelITC;
 import Utils.UtilParse;
 
@@ -223,7 +224,7 @@ public class ReadITC {
 		String startCla = clas.getAttribute("start");
 		String weeksCla = clas.getAttribute("weeks");
 		ClassRoomsITC rooms = new ClassRoomsITC();
-		ArrayList<TimesPenaltyITC> times = new ArrayList<>();
+		TimesPenaltysITC times = new TimesPenaltysITC();
 		NodeList roomN = clas.getElementsByTagName("room");
 		ArrayList<Element> roomL = UtilParse.getElements(roomN);
 		for (Element roomE : roomL) {

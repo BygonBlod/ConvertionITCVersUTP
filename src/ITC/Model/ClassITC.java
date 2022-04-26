@@ -11,10 +11,10 @@ public class ClassITC {
 	private String weeks;
 	private String room;
 	private ClassRoomsITC rooms;
-	private ArrayList<TimesPenaltyITC> times;
+	private TimesPenaltysITC times;
 	private ArrayList<StudentITC> students;
 
-	public ClassITC(String id, String limit, ClassRoomsITC rooms, ArrayList<TimesPenaltyITC> times) {
+	public ClassITC(String id, String limit, ClassRoomsITC rooms, TimesPenaltysITC times) {
 		this.id = id;
 		this.limit = limit;
 		this.parent = "";
@@ -36,7 +36,7 @@ public class ClassITC {
 		this.room = room;
 		this.students = students;
 		this.rooms = new ClassRoomsITC();
-		this.times = new ArrayList<>();
+		this.times = new TimesPenaltysITC();
 	}
 
 	public String getId() {
@@ -103,11 +103,11 @@ public class ClassITC {
 		this.rooms = rooms;
 	}
 
-	public ArrayList<TimesPenaltyITC> getTimes() {
+	public TimesPenaltysITC getTimes() {
 		return times;
 	}
 
-	public void setTimes(ArrayList<TimesPenaltyITC> times) {
+	public void setTimes(TimesPenaltysITC times) {
 		this.times = times;
 	}
 
