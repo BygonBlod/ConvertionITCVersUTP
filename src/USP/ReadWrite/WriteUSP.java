@@ -182,7 +182,6 @@ public class WriteUSP {
 				ruleE.appendChild(consE);
 				consE.setAttribute(Value_USP.Attibute_Name, cons.getName());
 				consE.setAttribute(Value_USP.Attibute_Type, cons.getType());
-				consE.setTextContent(" \n");
 				if (cons.getParameters().size() > 0) {
 					Element parameters = document.createElement(Value_USP.Constraint_Parameters);
 					consE.appendChild(parameters);
