@@ -21,6 +21,7 @@ import USP.Model.ConstraintUSP;
 import USP.Model.ConstraintsUSP;
 import USP.Model.CourseUSP;
 import USP.Model.FilterUSP;
+import USP.Model.ParameterUSP;
 import USP.Model.PartUSP;
 import USP.Model.RoomUSP;
 import USP.Model.RuleUSP;
@@ -34,6 +35,7 @@ public class ConvertisseurUSP {
 	private static boolean unionroom = false;
 	private static boolean multipleConfig = false;
 	private static ArrayList<RuleUSP> rules;
+	private static int slot;
 
 	public static Timetabling getTimeTabling(ProblemITC problem, boolean unionR, boolean multiple) {
 		unionroom = unionR;
@@ -53,6 +55,7 @@ public class ConvertisseurUSP {
 
 		Timetabling time = new Timetabling(problem.getName(), problem.getNrWeeks(), problem.getNrDays(),
 				problem.getSlotsPerDay());
+		slot = Integer.parseInt(problem.getNrDays()) * Integer.parseInt(problem.getNrWeeks());
 		time.setCourses(courses);
 		time.setRooms(rooms);
 		time.setRules(rules);
@@ -149,15 +152,17 @@ public class ConvertisseurUSP {
 				ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
 				ConstraintsUSP constraints = new ConstraintsUSP();
 				ArrayList<FilterUSP> filters = new ArrayList<>();
-				FilterUSP filter = new FilterUSP("room", "id");
-				filter.setIn(idrooms);
-				filters.add(filter);
-
 				SessionRuleUSP session = new SessionRuleUSP("class", filters);
 				session.setAttributeName("id");
 				session.setIn(classe.getId());
 				sessions.add(session);
-				ConstraintUSP cons = new ConstraintUSP("forbiddenRooms", "hard", new ArrayList<>());
+				ArrayList<ParameterUSP> parameters = new ArrayList<>();
+				ParameterUSP param = new ParameterUSP("rooms");
+				param.setType("ids");
+				param.setValue(idrooms);
+				parameters.add(param);
+
+				ConstraintUSP cons = new ConstraintUSP("forbiddenRooms", "hard", parameters);
 				constraints.add(cons);
 				RuleUSP rule = new RuleUSP(sessions, constraints);
 				rules.add(rule);
