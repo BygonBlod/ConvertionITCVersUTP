@@ -19,6 +19,7 @@ import org.w3c.dom.traversal.DocumentTraversal;
 
 import ITC.Model.ClassITC;
 import ITC.Model.ClassRoomITC;
+import ITC.Model.ClassRoomsITC;
 import ITC.Model.ConfigITC;
 import ITC.Model.CourseITC;
 import ITC.Model.DistributionITC;
@@ -221,7 +222,7 @@ public class ReadITC {
 		String daysCla = clas.getAttribute("days");
 		String startCla = clas.getAttribute("start");
 		String weeksCla = clas.getAttribute("weeks");
-		ArrayList<ClassRoomITC> rooms = new ArrayList<>();
+		ClassRoomsITC rooms = new ClassRoomsITC();
 		ArrayList<TimesPenaltyITC> times = new ArrayList<>();
 		NodeList roomN = clas.getElementsByTagName("room");
 		ArrayList<Element> roomL = UtilParse.getElements(roomN);

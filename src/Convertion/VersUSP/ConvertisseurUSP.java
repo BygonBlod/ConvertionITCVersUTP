@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import ITC.Model.ClassITC;
 import ITC.Model.ClassRoomITC;
+import ITC.Model.ClassRoomsITC;
 import ITC.Model.ConfigITC;
 import ITC.Model.CourseITC;
 import ITC.Model.DistributionITC;
@@ -32,6 +33,7 @@ import USP.Model.Timetabling;
 public class ConvertisseurUSP {
 	private static boolean unionroom = false;
 	private static boolean multipleConfig = false;
+	private static ArrayList<RuleUSP> rules;
 
 	public static Timetabling getTimeTabling(ProblemITC problem, boolean unionR, boolean multiple) {
 		unionroom = unionR;
@@ -40,7 +42,7 @@ public class ConvertisseurUSP {
 		ArrayList<TeacherUSP> teachers = new ArrayList<>();
 		ArrayList<CourseUSP> courses = new ArrayList<>();
 		ArrayList<StudentUSP> students = new ArrayList<>();
-		ArrayList<RuleUSP> rules = new ArrayList<>();
+		rules = new ArrayList<>();
 		SolutionUSP solution;
 
 		students = convertionStudents(students, problem.getStudents());
@@ -77,7 +79,7 @@ public class ConvertisseurUSP {
 				filters.add(filter);
 				SessionRuleUSP session = new SessionRuleUSP("courses", filters);
 				sessions.add(session);
-				ConstraintUSP cons = new ConstraintUSP("disjunctive", "hard", new ArrayList<>());
+				ConstraintUSP cons = new ConstraintUSP("disjunctive_room", "hard", new ArrayList<>());
 				constraints.add(cons);
 				RuleUSP rule = new RuleUSP(sessions, constraints);
 				rules.add(rule);
@@ -91,59 +93,83 @@ public class ConvertisseurUSP {
 			ArrayList<CourseITC> coursesItc) {
 		for (CourseITC course : coursesItc) {
 			ArrayList<PartUSP> parts = new ArrayList<>();
-			if (course.getConfig().size() == 1 || multipleConfig) {
-				for (ConfigITC conf : course.getConfig()) {
-					for (SubpartITC sub : conf.getSubpart()) {
-						ArrayList<ClassUSP> classes = new ArrayList<>();
-						for (ClassITC clas : sub.getClas()) {
-							ClassUSP clasU = new ClassUSP(clas.getId(), "");
-							clasU.setParent(clas.getParent());
-							classes.add(clasU);
-						}
-						AllowedRoomsUSP rooms = getAllowedRooms(sub.getClas());
-						PartUSP part = new PartUSP(sub.getId(), "", "", classes, new AllowedSlotsUSP("0", "", "", ""),
-								rooms, new AllowedTeachersUSP("0", new ArrayList<>()));
-						parts.add(part);
+			// if (course.getConfig().size() == 1 || multipleConfig) {
+			for (ConfigITC conf : course.getConfig()) {
+				for (SubpartITC sub : conf.getSubpart()) {
+					ArrayList<ClassUSP> classes = new ArrayList<>();
+					for (ClassITC clas : sub.getClas()) {
+						ClassUSP clasU = new ClassUSP(clas.getId(), clas.getLimit());
+						clasU.setParent(clas.getParent());
+						classes.add(clasU);
 					}
+					AllowedRoomsUSP rooms = getAllowedRooms(sub.getClas());
+					AllowedSlotsUSP slots = getAllowedSlots(sub);
+					PartUSP part = new PartUSP(sub.getId(), "", "", classes, slots, rooms,
+							new AllowedTeachersUSP("0", new ArrayList<>()));
+					parts.add(part);
 				}
 			}
+			// }
 			CourseUSP courseU = new CourseUSP(course.getId(), parts);
 			coursesUsp.add(courseU);
 		}
 		return coursesUsp;
 	}
 
+	private static AllowedSlotsUSP getAllowedSlots(SubpartITC sub) {
+		AllowedSlotsUSP slots = new AllowedSlotsUSP("", "", "", "");
+
+		return slots;
+	}
+
 	private static AllowedRoomsUSP getAllowedRooms(ArrayList<ClassITC> clas) {
 		AllowedRoomsUSP rooms = new AllowedRoomsUSP("none");
 		for (ClassITC classe : clas) {
-			if (unionroom) {
-				for (ClassRoomITC room : classe.getRooms()) {
-					if (!rooms.containsRoom(room.getId())) {
-						AllowedRoomUSP roomU = new AllowedRoomUSP(room.getId(), "");
-						rooms.add(roomU);
-					}
+			for (ClassRoomITC room : classe.getRooms()) {
+				if (!rooms.containsRoom(room.getId())) {
+					AllowedRoomUSP roomU = new AllowedRoomUSP(room.getId(), "");
+					rooms.add(roomU);
 				}
-			} else {
-				rooms = intersection(rooms, classe.getRooms());
+			}
+		}
+		for (ClassITC classe : clas) {
+			String idrooms = inintersection(rooms, classe.getRooms());
+			if (!idrooms.equals("")) {
+				ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
+				ConstraintsUSP constraints = new ConstraintsUSP();
+				ArrayList<FilterUSP> filters = new ArrayList<>();
+				FilterUSP filter = new FilterUSP("room", "id");
+				filter.setIn(idrooms);
+				filters.add(filter);
+
+				SessionRuleUSP session = new SessionRuleUSP("class", filters);
+				session.setAttributeName("id");
+				session.setIn(classe.getId());
+				sessions.add(session);
+				ConstraintUSP cons = new ConstraintUSP("forbidenRooms", "hard", new ArrayList<>());
+				constraints.add(cons);
+				RuleUSP rule = new RuleUSP(sessions, constraints);
+				rules.add(rule);
 			}
 		}
 		return rooms;
 	}
 
-	private static AllowedRoomsUSP intersection(AllowedRoomsUSP rooms, ArrayList<ClassRoomITC> roomsITC) {
-		AllowedRoomsUSP res = new AllowedRoomsUSP(rooms.getSessionRooms());
-		if (rooms.size() == 0) {
-			for (ClassRoomITC roomI : roomsITC) {
-				res.add(new AllowedRoomUSP(roomI.getId(), ""));
-			}
-		} else {
-			for (ClassRoomITC roomI : roomsITC) {
-				if (rooms.containsRoom(roomI.getId())) {
-					res.add(new AllowedRoomUSP(roomI.getId(), ""));
+	private static String inintersection(AllowedRoomsUSP rooms, ClassRoomsITC roomsITC) {
+		String res2 = "";
+		if (rooms.size() != roomsITC.size()) {
+			for (AllowedRoomUSP roomI : rooms) {
+				if (!roomsITC.containsRoom(roomI.getRefId())) {
+					res2 += roomI.getRefId() + ",";
 				}
 			}
+			System.out.println("avant :" + res2 + "/");
+			if (!res2.equals("")) {
+				res2.substring(0, res2.length() - 1);
+			}
+			System.out.println("après :" + res2 + "/");
 		}
-		return res;
+		return res2;
 	}
 
 	private static ArrayList<RoomUSP> convertionRooms(ArrayList<RoomUSP> roomsUsp, ArrayList<RoomITC> roomsItc) {
