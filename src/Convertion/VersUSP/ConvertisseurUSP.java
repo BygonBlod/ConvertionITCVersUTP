@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import ITC.Model.ClassITC;
 import ITC.Model.ClassRoomITC;
 import ITC.Model.ClassRoomsITC;
+import ITC.Model.ClassesITC;
 import ITC.Model.ConfigITC;
 import ITC.Model.CourseITC;
 import ITC.Model.DistributionITC;
@@ -12,6 +13,7 @@ import ITC.Model.ProblemITC;
 import ITC.Model.RoomITC;
 import ITC.Model.StudentITC;
 import ITC.Model.SubpartITC;
+import ITC.Model.TimesPenaltyITC;
 import USP.Model.AllowedRoomUSP;
 import USP.Model.AllowedRoomsUSP;
 import USP.Model.AllowedSlotsUSP;
@@ -51,7 +53,7 @@ public class ConvertisseurUSP {
 		rooms = convertionRooms(rooms, problem.getRooms());
 		courses = convertionCourses(courses, problem.getCourses());
 		solution = new SolutionUSP();
-		rules = convertionDistibution(rules, problem.getDistributions());
+		convertionDistibution(problem.getDistributions());
 
 		Timetabling time = new Timetabling(problem.getName(), problem.getNrWeeks(), problem.getNrDays(),
 				problem.getSlotsPerDay());
@@ -65,8 +67,13 @@ public class ConvertisseurUSP {
 		return time;
 	}
 
-	private static ArrayList<RuleUSP> convertionDistibution(ArrayList<RuleUSP> rules,
-			ArrayList<DistributionITC> distributions) {
+	private static void setForbiddenPeriod(ClassesITC arrayList) {
+		for (ClassITC classe : arrayList) {
+			classe.getForbiddenPeriod();
+		}
+	}
+
+	private static void convertionDistibution(ArrayList<DistributionITC> distributions) {
 		for (DistributionITC distrib : distributions) {
 			if (distrib.getType().equals("SameAttendees") && distrib.getRequired().equals("true")) {
 				String s = "";
@@ -88,8 +95,6 @@ public class ConvertisseurUSP {
 				rules.add(rule);
 			}
 		}
-
-		return rules;
 	}
 
 	private static ArrayList<CourseUSP> convertionCourses(ArrayList<CourseUSP> coursesUsp,
@@ -121,17 +126,22 @@ public class ConvertisseurUSP {
 					}
 					i++;
 				}
-			} else {
-				System.out.println("non de non");
 			}
-
 		}
 		return coursesUsp;
-
 	}
 
 	private static AllowedSlotsUSP getAllowedSlots(SubpartITC sub) {
 		AllowedSlotsUSP slots = new AllowedSlotsUSP("", "", "", "");
+		if (sub.sameTimesLSD() && sub.getAllTimes().size() > 0 && !sub.getWeeksLSD().equals("")) {
+			TimesPenaltyITC time = sub.getAllTimes().get(0);
+			System.out.println(sub.getId());
+			slots.setDailySlots(time.getStartUSP());
+			slots.setSessionLength(time.getLengthUSP());
+			slots.setDays(time.getDaysUSP());
+			slots.setWeeks(sub.getWeeksLSD());
+			setForbiddenPeriod(sub.getClas());
+		}
 
 		return slots;
 	}
