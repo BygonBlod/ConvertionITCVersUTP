@@ -1,5 +1,7 @@
 package USP.Model;
 
+import java.util.ArrayList;
+
 public class AllowedSlotsUSP {
 	private String sessionLength;
 	private String dailySlots;
@@ -15,6 +17,22 @@ public class AllowedSlotsUSP {
 
 	public String getSessionLength() {
 		return sessionLength;
+	}
+
+	public String getLengthITC() {
+		String s = "";
+		int i = Integer.parseInt(getSessionLength()) / 5;
+		return s + i;
+	}
+
+	public ArrayList<String> getDailySlotsITC() {
+		ArrayList<String> s = new ArrayList<>();
+		String[] daily = getDailySlots().split(",");
+		for (int i = 0; i < daily.length; i++) {
+			int value = Integer.parseInt(daily[i]) / 5;
+			s.add(value + "");
+		}
+		return s;
 	}
 
 	public void setSessionLength(String sessionLength) {
