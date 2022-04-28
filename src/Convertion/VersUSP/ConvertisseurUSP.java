@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import ITC.Model.ClassITC;
 import ITC.Model.ClassRoomITC;
 import ITC.Model.ClassRoomsITC;
-import ITC.Model.ClassesITC;
 import ITC.Model.ConfigITC;
 import ITC.Model.CourseITC;
 import ITC.Model.DistributionITC;
@@ -38,6 +37,7 @@ public class ConvertisseurUSP {
 	private static boolean multipleConfig = false;
 	private static ArrayList<RuleUSP> rules;
 	private static int slot;
+	private static int nbDays;
 
 	public static Timetabling getTimeTabling(ProblemITC problem, boolean unionR, boolean multiple) {
 		unionroom = unionR;
@@ -48,6 +48,8 @@ public class ConvertisseurUSP {
 		ArrayList<StudentUSP> students = new ArrayList<>();
 		rules = new ArrayList<>();
 		SolutionUSP solution;
+		slot = Integer.parseInt(problem.getNrDays()) * Integer.parseInt(problem.getNrWeeks());
+		nbDays = Integer.parseInt(problem.getNrDays());
 
 		students = convertionStudents(students, problem.getStudents());
 		rooms = convertionRooms(rooms, problem.getRooms());
@@ -57,7 +59,6 @@ public class ConvertisseurUSP {
 
 		Timetabling time = new Timetabling(problem.getName(), problem.getNrWeeks(), problem.getNrDays(),
 				problem.getSlotsPerDay());
-		slot = Integer.parseInt(problem.getNrDays()) * Integer.parseInt(problem.getNrWeeks());
 		time.setCourses(courses);
 		time.setRooms(rooms);
 		time.setRules(rules);
@@ -67,9 +68,12 @@ public class ConvertisseurUSP {
 		return time;
 	}
 
-	private static void setForbiddenPeriod(ClassesITC arrayList) {
-		for (ClassITC classe : arrayList) {
-			classe.getForbiddenPeriod();
+	private static void setForbiddenPeriod(SubpartITC sub) {
+		int start = (sub.getFirstWeek(sub.getAllTimes()) - 1) * 1440 * nbDays;
+		int end = sub.getLastWeek(sub.getAllTimes()) * 1440 * nbDays;
+		for (ClassITC classe : sub.getClas()) {
+			ArrayList<String> forbidden = classe.getForbiddenPeriod(start, end);
+			System.out.println(forbidden.toString());
 		}
 	}
 
@@ -89,7 +93,7 @@ public class ConvertisseurUSP {
 				filters.add(filter);
 				SessionRuleUSP session = new SessionRuleUSP("courses", filters);
 				sessions.add(session);
-				ConstraintUSP cons = new ConstraintUSP("disjunctive_room", "hard", new ArrayList<>());
+				ConstraintUSP cons = new ConstraintUSP("disjunctive", "hard", new ArrayList<>());
 				constraints.add(cons);
 				RuleUSP rule = new RuleUSP(sessions, constraints);
 				rules.add(rule);
@@ -107,6 +111,9 @@ public class ConvertisseurUSP {
 					for (SubpartITC sub : conf.getSubpart()) {
 						ArrayList<ClassUSP> classes = new ArrayList<>();
 						for (ClassITC clas : sub.getClas()) {
+							if (clas.checkWeeks()) {
+								setPeriodic(clas);
+							}
 							ClassUSP clasU = new ClassUSP(clas.getId(), clas.getLimit());
 							clasU.setParent(clas.getParent());
 							classes.add(clasU);
@@ -131,16 +138,41 @@ public class ConvertisseurUSP {
 		return coursesUsp;
 	}
 
+	private static void setPeriodic(ClassITC clas) {
+		ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		FilterUSP filter = new FilterUSP("class", "id");
+		filter.setIn(clas.getId());
+		filters.add(filter);
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		sessions.add(session);
+		ArrayList<ParameterUSP> parameters = new ArrayList<>();
+		ParameterUSP param1 = new ParameterUSP("value");
+		param1.setType("slots");
+		param1.setValue(clas.getNbSessionWeek() + "");
+		ParameterUSP param2 = new ParameterUSP("unit");
+		param2.setType("time");
+		param2.setValue("week");
+		parameters.add(param1);
+		parameters.add(param2);
+		ConstraintUSP cons = new ConstraintUSP("Periodic", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
+	}
+
 	private static AllowedSlotsUSP getAllowedSlots(SubpartITC sub) {
 		AllowedSlotsUSP slots = new AllowedSlotsUSP("", "", "", "");
-		if (sub.sameTimesLSD() && sub.getAllTimes().size() > 0 && !sub.getWeeksLSD().equals("")) {
+		String weeks = sub.getWeeksLSD();
+		if (sub.sameTimesLSD(sub.getId()) && sub.getAllTimes().size() > 0 && !weeks.equals("")) {
 			TimesPenaltyITC time = sub.getAllTimes().get(0);
 			System.out.println(sub.getId());
 			slots.setDailySlots(time.getStartUSP());
 			slots.setSessionLength(time.getLengthUSP());
 			slots.setDays(time.getDaysUSP());
-			slots.setWeeks(sub.getWeeksLSD());
-			setForbiddenPeriod(sub.getClas());
+			slots.setWeeks(weeks);
+			setForbiddenPeriod(sub);
 		}
 
 		return slots;
