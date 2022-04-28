@@ -39,10 +39,28 @@ public class ClassITC {
 		this.times = new TimesPenaltysITC();
 	}
 
-	public ArrayList<String> getForbiddenPeriod() {
+	public ArrayList<String> getForbiddenPeriod(int min, int max) {
 		ArrayList<String> res = new ArrayList<>();
-		ArrayList<TimesPenaltysITC> times = triDay();
+		ArrayList<TimesPenaltysITC> timesTri = triDay();
+		TimesPenaltyITC temp = getTimes().get(0);
+		int startForb = min;
+		int endForb = 0;
+		int day = 0;
+		int dayTime = 1440;
 
+		for (TimesPenaltysITC times : timesTri) {
+			for (TimesPenaltyITC time : times) {
+				int startC = Integer.parseInt(time.getStartUSP());
+				int length = Integer.parseInt(time.getLengthUSP());
+				endForb = (dayTime * day) + startC - 1;
+				res.add(startForb + "-" + endForb);
+				startForb = (dayTime * day) + startC + length + 1;
+
+			}
+			day++;
+		}
+		endForb = max;
+		res.add(startForb + "-" + endForb);
 		return res;
 	}
 
@@ -58,12 +76,28 @@ public class ClassITC {
 							times.add(time);
 						}
 					}
-					System.out.println("semaines " + (i + 1) + " jours " + (j + 1) + " " + times.size());
 					res.add(times);
+					// System.out.println("semaines " + (i + 1) + " jours " + (j + 1) + " ou jour "
+					// + ((i * 7) + j + 1)
+					// + " " + times.size() + " " + res.size());
 				}
 			}
 		}
 		return res;
+	}
+
+	public boolean checkWeeks() {
+		String weeks = getWeeks();
+		for (int i = 1; i < weeks.length() - 1; i++) {
+			char c1 = weeks.charAt(i - 1);
+			char c2 = weeks.charAt(i);
+			char c3 = weeks.charAt(i + 1);
+			if (c1 == '1' && c3 == '1' && c2 != '1') {
+				return false;
+			}
+
+		}
+		return true;
 	}
 
 	public String getId() {
@@ -144,6 +178,20 @@ public class ClassITC {
 
 	public void setStudents(ArrayList<StudentITC> students) {
 		this.students = students;
+	}
+
+	public int getNbSessionWeek() {
+		int res = 0;
+		if (getTimes().size() > 0) {
+			TimesPenaltyITC time = getTimes().get(0);
+			String days = time.getDays();
+			for (int i = 0; i < days.length(); i++) {
+				if (days.charAt(i) == '1') {
+					res++;
+				}
+			}
+		}
+		return res;
 	}
 
 }

@@ -1,5 +1,7 @@
 package ITC.Model;
 
+import java.util.ArrayList;
+
 public class TimesPenaltyITC extends TimesITC {
 	private String penalty;
 
@@ -44,19 +46,17 @@ public class TimesPenaltyITC extends TimesITC {
 	}
 
 	public boolean checkWeeks() {
-		boolean check = false;
 		String weeks = getWeeks();
-		for (int i = 0; i < weeks.length(); i++) {
-			char c = weeks.charAt(i);
-			if (c == '0' && check) {
+		for (int i = 1; i < weeks.length() - 1; i++) {
+			char c1 = weeks.charAt(i - 1);
+			char c2 = weeks.charAt(i);
+			char c3 = weeks.charAt(i + 1);
+			if (c1 == '1' && c3 == '1' && c2 != '1') {
 				return false;
 			}
-			if (c == '1') {
-				check = true;
-			}
-		}
 
-		return check;
+		}
+		return true;
 	}
 
 	public int getFirstWeeks() {
@@ -87,6 +87,17 @@ public class TimesPenaltyITC extends TimesITC {
 		s += "days =" + getDays();
 		s += " weeks =" + getWeeks();
 		return s;
+	}
+
+	public ArrayList<Integer> getWeeksUSP() {
+		ArrayList<Integer> res = new ArrayList<>();
+		String weeks = getWeeks();
+		for (int i = 0; i < weeks.length(); i++) {
+			if (weeks.charAt(i) == '1') {
+				res.add(i + 1);
+			}
+		}
+		return res;
 	}
 
 }

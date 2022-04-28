@@ -1,5 +1,7 @@
 package ITC.Model;
 
+import java.util.ArrayList;
+
 public class SubpartITC {
 	private String id;
 	ClassesITC clas;
@@ -21,7 +23,7 @@ public class SubpartITC {
 		return res;
 	}
 
-	public boolean sameTimesLSD() {
+	public boolean sameTimesLSD(String i) {
 		TimesPenaltysITC times = getAllTimes();
 		String length = "";
 		String start = "";
@@ -43,26 +45,40 @@ public class SubpartITC {
 	}
 
 	public String getWeeksLSD() {
-		String s = "";
+		ArrayList<Integer> s = new ArrayList<>();
 		TimesPenaltysITC times = getAllTimes();
 		if (times.checkAllWeeks()) {
-			s += getFirstWeek(times) + "-";
-			s += getLastWeek(times);
+			for (TimesPenaltyITC time : times) {
+				ArrayList<Integer> timeWeek = time.getWeeksUSP();
+				for (int i = 0; i < timeWeek.size(); i++) {
+					if (!s.contains(timeWeek.get(i))) {
+						s.add(timeWeek.get(i));
+					}
+				}
+			}
 		}
-		return s;
+		s.sort(null);
+		String res = "";
+		for (int st : s) {
+			res += st + ",";
+		}
+		if (res.length() > 0) {
+			res = res.substring(0, res.length() - 1);
+		}
+		return res;
 	}
 
-	private String getLastWeek(TimesPenaltysITC times) {
+	public int getLastWeek(TimesPenaltysITC times) {
 		int max = 0;
 		for (TimesPenaltyITC time : times) {
 			if (max < time.getLastWeeks()) {
 				max = time.getLastWeeks();
 			}
 		}
-		return max + "";
+		return max;
 	}
 
-	private String getFirstWeek(TimesPenaltysITC times) {
+	public int getFirstWeek(TimesPenaltysITC times) {
 		int min = 0;
 		for (TimesPenaltyITC time : times) {
 			if (min == 0) {
@@ -73,7 +89,7 @@ public class SubpartITC {
 				min = temp;
 			}
 		}
-		return min + "";
+		return min;
 	}
 
 	public String getId() {
