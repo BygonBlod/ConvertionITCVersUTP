@@ -39,6 +39,33 @@ public class ClassITC {
 		this.times = new TimesPenaltysITC();
 	}
 
+	public ArrayList<String> getForbiddenPeriod() {
+		ArrayList<String> res = new ArrayList<>();
+		ArrayList<TimesPenaltysITC> times = triDay();
+
+		return res;
+	}
+
+	public ArrayList<TimesPenaltysITC> triDay() {
+		ArrayList<TimesPenaltysITC> res = new ArrayList<>();
+		TimesPenaltyITC temp = getTimes().get(0);
+		if (temp != null) {
+			for (int i = 0; i < temp.getWeeks().length(); i++) {// pour chaque semaine
+				for (int j = 0; j < temp.getDays().length(); j++) {// pour chaque jour
+					TimesPenaltysITC times = new TimesPenaltysITC();
+					for (TimesPenaltyITC time : getTimes()) {
+						if (time.getWeeks().charAt(i) == '1' && time.getDays().charAt(j) == '1') {
+							times.add(time);
+						}
+					}
+					System.out.println("semaines " + (i + 1) + " jours " + (j + 1) + " " + times.size());
+					res.add(times);
+				}
+			}
+		}
+		return res;
+	}
+
 	public String getId() {
 		return id;
 	}

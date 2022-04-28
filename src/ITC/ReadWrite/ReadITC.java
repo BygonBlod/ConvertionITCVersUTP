@@ -20,6 +20,7 @@ import org.w3c.dom.traversal.DocumentTraversal;
 import ITC.Model.ClassITC;
 import ITC.Model.ClassRoomITC;
 import ITC.Model.ClassRoomsITC;
+import ITC.Model.ClassesITC;
 import ITC.Model.ConfigITC;
 import ITC.Model.CourseITC;
 import ITC.Model.DistributionITC;
@@ -205,7 +206,7 @@ public class ReadITC {
 
 	private static SubpartITC getSubpartITC(Element subpart) {
 		String idSub = subpart.getAttribute("id");
-		ArrayList<ClassITC> classes = new ArrayList<>();
+		ClassesITC classes = new ClassesITC();
 		NodeList classeS = subpart.getElementsByTagName("class");
 		ArrayList<Element> classeL = UtilParse.getElements(classeS);
 		for (Element clas : classeL) {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import ITC.Model.ClassITC;
 import ITC.Model.ClassRoomITC;
 import ITC.Model.ClassRoomsITC;
+import ITC.Model.ClassesITC;
 import ITC.Model.ConfigITC;
 import ITC.Model.CourseITC;
 import ITC.Model.DistributionITC;
@@ -83,7 +84,7 @@ public class ConvertisseurITC {
 			ArrayList<ConfigITC> configs = new ArrayList<>();
 			ArrayList<SubpartITC> parts = new ArrayList<>();
 			for (PartUSP part : course.getParts()) {
-				ArrayList<ClassITC> classes = new ArrayList<>();
+				ClassesITC classes = new ClassesITC();
 				for (ClassUSP classe : part.getClasses()) {
 					ClassRoomsITC rooms = new ClassRoomsITC();
 					AllowedRoomsUSP alloRooms = part.getRoom();

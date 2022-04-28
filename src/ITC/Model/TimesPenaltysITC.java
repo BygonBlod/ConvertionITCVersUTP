@@ -18,4 +18,13 @@ public class TimesPenaltysITC extends ArrayList<TimesPenaltyITC> {
 		return false;
 	}
 
+	public boolean checkAllWeeks() {
+		for (TimesPenaltyITC time : this) {
+			if (!time.checkWeeks()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }
