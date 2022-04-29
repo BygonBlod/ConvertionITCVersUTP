@@ -147,6 +147,9 @@ public class ConvertisseurUSP {
 							if (clas.checkWeeks()) {
 								setPeriodic(clas);
 							}
+							if (clas.getTimes().size() > 0) {
+								setSameDaySlot(clas.getId());
+							}
 							ClassUSP clasU = new ClassUSP(clas.getId(), clas.getLimit());
 							clasU.setParent(clas.getParent());
 							classes.add(clasU);
@@ -169,6 +172,22 @@ public class ConvertisseurUSP {
 			}
 		}
 		return coursesUsp;
+	}
+
+	private static void setSameDaySlot(String id) {
+		ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(id);
+		sessions.add(session);
+		ArrayList<ParameterUSP> parameters = new ArrayList<>();
+		ConstraintUSP cons = new ConstraintUSP("sameDaySlot", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
+
 	}
 
 	private static void setPeriodic(ClassITC clas) {
