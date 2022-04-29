@@ -71,9 +71,42 @@ public class ConvertisseurUSP {
 	private static void setForbiddenPeriod(SubpartITC sub) {
 		int start = (sub.getFirstWeek(sub.getAllTimes()) - 1) * 1440 * nbDays;
 		int end = sub.getLastWeek(sub.getAllTimes()) * 1440 * nbDays;
+		System.out.println("sub id:" + sub.getId());
 		for (ClassITC classe : sub.getClas()) {
 			ArrayList<String> forbidden = classe.getForbiddenPeriod(start, end);
-			System.out.println(forbidden.toString());
+			System.out.println("	" + classe.getId() + ": " + forbidden.toString());
+
+			int nbTest = 0;
+			for (String forbid : forbidden) {
+				String[] forbidSplit = forbid.split("-");
+				if (forbidSplit.length == 2) {
+					nbTest++;
+					ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
+					ConstraintsUSP constraints = new ConstraintsUSP();
+					ArrayList<FilterUSP> filters = new ArrayList<>();
+					SessionRuleUSP session = new SessionRuleUSP("class", filters);
+					session.setAttributeName("id");
+					session.setIn(classe.getId());
+					sessions.add(session);
+					ArrayList<ParameterUSP> parameters = new ArrayList<>();
+					ParameterUSP param1 = new ParameterUSP("first");
+					param1.setType("slot");
+					param1.setValue(forbidSplit[0]);
+					ParameterUSP param2 = new ParameterUSP("last");
+					param2.setType("slot");
+					param2.setValue(forbidSplit[1]);
+					parameters.add(param1);
+					parameters.add(param2);
+					ConstraintUSP cons = new ConstraintUSP("ForbiddenPeriod", "hard", parameters);
+					constraints.add(cons);
+					RuleUSP rule = new RuleUSP(sessions, constraints);
+					rules.add(rule);
+				}
+			}
+			if (nbTest == forbidden.size()) {
+				// System.out.println("bon");
+			}
+
 		}
 	}
 
@@ -167,7 +200,7 @@ public class ConvertisseurUSP {
 		String weeks = sub.getWeeksLSD();
 		if (sub.sameTimesLSD(sub.getId()) && sub.getAllTimes().size() > 0 && !weeks.equals("")) {
 			TimesPenaltyITC time = sub.getAllTimes().get(0);
-			System.out.println(sub.getId());
+			// System.out.println(sub.getId());
 			slots.setDailySlots(time.getStartUSP());
 			slots.setSessionLength(time.getLengthUSP());
 			slots.setDays(time.getDaysUSP());
