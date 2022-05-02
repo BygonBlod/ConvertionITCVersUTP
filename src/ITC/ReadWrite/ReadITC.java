@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,7 +35,7 @@ import ITC.Model.TimesITC;
 import ITC.Model.TimesPenaltyITC;
 import ITC.Model.TimesPenaltysITC;
 import ITC.Model.TravelITC;
-import Utils.UtilParse;
+import Utils.Util;
 
 public class ReadITC {
 	static ArrayList<RoomITC> rooms = new ArrayList<RoomITC>();
@@ -46,6 +47,7 @@ public class ReadITC {
 	static boolean ajout = false;
 	static String filename;
 	public static int nbFile = 0;
+	public static HashMap<String, Integer> nbContraintes = new HashMap<>();
 	static ArrayList<String> lignes;
 
 	public static ProblemITC getProblem(String args, boolean mul) {
@@ -79,7 +81,7 @@ public class ReadITC {
 				String nrWeeks = racineE.getAttribute("nrWeeks");
 				problem = new ProblemITC(name, nrDays, slotsPerDay, nrWeeks);
 				NodeList listRacine = racineE.getChildNodes();
-				ArrayList<Element> racineL = UtilParse.getElements(listRacine);
+				ArrayList<Element> racineL = Util.getElements(listRacine);
 				for (Element element : racineL) {
 					switch (element.getTagName()) {
 					case "rooms":
@@ -139,7 +141,7 @@ public class ReadITC {
 		String country = element.getAttribute("country");
 		ArrayList<ClassITC> classes = new ArrayList<>();
 		NodeList listClass = element.getElementsByTagName("class");
-		ArrayList<Element> classL = UtilParse.getElements(listClass);
+		ArrayList<Element> classL = Util.getElements(listClass);
 		for (Element classE : classL) {
 			String days = classE.getAttribute("days");
 			String start = classE.getAttribute("start");
@@ -147,7 +149,7 @@ public class ReadITC {
 			String room = classE.getAttribute("room");
 			ArrayList<StudentITC> students = new ArrayList<>();
 			NodeList listStudent = classE.getElementsByTagName("student");
-			ArrayList<Element> studentL = UtilParse.getElements(listStudent);
+			ArrayList<Element> studentL = Util.getElements(listStudent);
 			for (Element studentE : studentL) {
 				String id = studentE.getAttribute("id");
 				StudentITC studentI = new StudentITC(id);
@@ -160,7 +162,7 @@ public class ReadITC {
 
 	private static void parseCourses(Element element) {
 		NodeList cours = element.getElementsByTagName("course");
-		ArrayList<Element> coursL = UtilParse.getElements(cours);
+		ArrayList<Element> coursL = Util.getElements(cours);
 		for (Element cour : coursL) {
 			CourseITC course = getCourseITC(cour);
 			courses.add(course);
@@ -172,7 +174,7 @@ public class ReadITC {
 		ArrayList<ConfigITC> configs = new ArrayList<>();
 		boolean multiple = false;
 		NodeList configS = cour.getElementsByTagName("config");
-		ArrayList<Element> configL = UtilParse.getElements(configS);
+		ArrayList<Element> configL = Util.getElements(configS);
 		if (configL.size() > 1) {
 			multiple = true;
 			ajout = true;
@@ -196,7 +198,7 @@ public class ReadITC {
 		String idConf = config.getAttribute("id");
 		ArrayList<SubpartITC> subparts = new ArrayList<>();
 		NodeList subpartS = config.getElementsByTagName("subpart");
-		ArrayList<Element> subpartL = UtilParse.getElements(subpartS);
+		ArrayList<Element> subpartL = Util.getElements(subpartS);
 		for (Element subpart : subpartL) {
 			SubpartITC subpartI = getSubpartITC(subpart);
 			subparts.add(subpartI);
@@ -208,7 +210,7 @@ public class ReadITC {
 		String idSub = subpart.getAttribute("id");
 		ClassesITC classes = new ClassesITC();
 		NodeList classeS = subpart.getElementsByTagName("class");
-		ArrayList<Element> classeL = UtilParse.getElements(classeS);
+		ArrayList<Element> classeL = Util.getElements(classeS);
 		for (Element clas : classeL) {
 			ClassITC classI = getClassITC(clas);
 			classes.add(classI);
@@ -227,14 +229,14 @@ public class ReadITC {
 		ClassRoomsITC rooms = new ClassRoomsITC();
 		TimesPenaltysITC times = new TimesPenaltysITC();
 		NodeList roomN = clas.getElementsByTagName("room");
-		ArrayList<Element> roomL = UtilParse.getElements(roomN);
+		ArrayList<Element> roomL = Util.getElements(roomN);
 		for (Element roomE : roomL) {
 			String idRoom = roomE.getAttribute("id");
 			String penalty = roomE.getAttribute("penalty");
 			rooms.add(new ClassRoomITC(idRoom, penalty));
 		}
 		NodeList timeN = clas.getElementsByTagName("time");
-		ArrayList<Element> timeL = UtilParse.getElements(timeN);
+		ArrayList<Element> timeL = Util.getElements(timeN);
 		for (Element time : timeL) {
 			String days = time.getAttribute("days");
 			String start = time.getAttribute("start");
@@ -255,21 +257,21 @@ public class ReadITC {
 
 	public static void parseRoom(Element ele) {
 		NodeList room = ele.getElementsByTagName("room");
-		ArrayList<Element> roomL = UtilParse.getElements(room);
+		ArrayList<Element> roomL = Util.getElements(room);
 		for (Element e : roomL) {
 			String id = e.getAttribute("id");
 			String capacity = e.getAttribute("capacity");
 			ArrayList<TravelITC> travel = new ArrayList<>();
 			ArrayList<TimesITC> unavailable = new ArrayList<>();
 			NodeList childTravel = e.getElementsByTagName("travel");
-			ArrayList<Element> travelL = UtilParse.getElements(childTravel);
+			ArrayList<Element> travelL = Util.getElements(childTravel);
 			for (Element trave : travelL) {
 				String idRoom = trave.getAttribute("room");
 				String value = trave.getAttribute("value");
 				travel.add(new TravelITC(idRoom, value));
 			}
 			NodeList childUnavailable = e.getElementsByTagName("unavailable");
-			ArrayList<Element> unaL = UtilParse.getElements(childUnavailable);
+			ArrayList<Element> unaL = Util.getElements(childUnavailable);
 			for (Element una : unaL) {
 				String days = una.getAttribute("days");
 				String start = una.getAttribute("start");
@@ -285,18 +287,19 @@ public class ReadITC {
 
 	public static void parseDistribution(Element ele) {
 		NodeList distrib = ele.getElementsByTagName("distribution");
-		ArrayList<Element> distribL = UtilParse.getElements(distrib);
+		ArrayList<Element> distribL = Util.getElements(distrib);
 		for (Element di : distribL) {
 			String type = di.getAttribute("type");
 			String required = di.getAttribute("required");
 			String penalty = di.getAttribute("penalty");
 			ArrayList<String> classD = new ArrayList<>();
 			NodeList classDi = di.getElementsByTagName("class");
-			ArrayList<Element> classDiL = UtilParse.getElements(classDi);
+			ArrayList<Element> classDiL = Util.getElements(classDi);
 			for (Element clas : classDiL) {
 				String id = clas.getAttribute("id");
 				classD.add(id);
 			}
+			addContraintes(type);
 			DistributionITC distribution = new DistributionITC(type, classD);
 			distribution.setRequired(required);
 			distribution.setPenalty(penalty);
@@ -306,14 +309,24 @@ public class ReadITC {
 
 	}
 
+	private static void addContraintes(String type) {
+		Integer value = nbContraintes.get(type);
+		if (value == null) {
+			nbContraintes.put(type, 1);
+		} else {
+			nbContraintes.put(type, nbContraintes.get(type) + 1);
+		}
+
+	}
+
 	public static void parseStudent(Element ele) {
 		NodeList studentS = ele.getElementsByTagName("student");
-		ArrayList<Element> studentList = UtilParse.getElements(studentS);
+		ArrayList<Element> studentList = Util.getElements(studentS);
 		for (Element student : studentList) {
 			String id = student.getAttribute("id");
 			ArrayList<String> courses = new ArrayList<>();
 			NodeList cours = student.getElementsByTagName("course");
-			ArrayList<Element> courS = UtilParse.getElements(cours);
+			ArrayList<Element> courS = Util.getElements(cours);
 			for (Element cour : courS) {
 				String idCour = cour.getAttribute("id");
 				courses.add(idCour);

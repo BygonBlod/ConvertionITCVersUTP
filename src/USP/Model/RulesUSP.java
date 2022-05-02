@@ -9,15 +9,18 @@ public class RulesUSP extends ArrayList<RuleUSP> {
 		super();
 	}
 
-	public RulesUSP getForbidenPeriodClass(String id) {
-		RulesUSP rules = new RulesUSP();
+	public List<String> getForbidenPeriodClass(String id) {
+		List<String> res = new ArrayList<>();
 		for (RuleUSP rule : this) {
-			if (rule.getConstraint().containsCons("ForbiddenPeriod", "hard") > -1
-					&& rule.getSessions().containsClassID(id) > -1) {
-				rules.add(rule);
+			int cons = rule.getConstraint().containsCons("forbiddenPeriod", "hard");
+			if (cons > -1 && rule.getSessions().containsClassID(id) > -1) {
+				ConstraintUSP constraint = rule.getConstraint().get(cons);
+				String first = constraint.getParameters().getValueParam("first", "slot");
+				String last = constraint.getParameters().getValueParam("last", "slot");
+				res.add(first + "-" + last);
 			}
 		}
-		return rules;
+		return res;
 	}
 
 	public List<String> getForbidenRoomsClass(String id) {
@@ -25,18 +28,12 @@ public class RulesUSP extends ArrayList<RuleUSP> {
 		for (RuleUSP rule : this) {
 			int cons = rule.getConstraint().containsCons("forbiddenRooms", "hard");
 			int ses = rule.getSessions().containsClassID(id);
-			if (cons > -1 || ses > -1) {
-				// System.out.println(cons + " " + ses);
-			}
 			if (cons > -1 && ses > -1) {
-				System.out.println("rentrer");
 				ConstraintUSP constraint = rule.getConstraint().get(cons);
-				ArrayList<ParameterUSP> parameters = constraint.getParameters();
-				for (ParameterUSP param : parameters) {
-					if (param.getName().equals("rooms") && param.getType().equals("ids")) {
-						String[] splitRoom = param.getValue().split(",");
-						res = Arrays.asList(splitRoom);
-					}
+				String rooms = constraint.getParameters().getValueParam("rooms", "ids");
+				if (!rooms.equals("")) {
+					String[] splitRoom = rooms.split(",");
+					res = Arrays.asList(splitRoom);
 				}
 			}
 		}

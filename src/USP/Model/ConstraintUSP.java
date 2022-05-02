@@ -1,13 +1,11 @@
 package USP.Model;
 
-import java.util.ArrayList;
-
 public class ConstraintUSP {
 	private String name;
 	private String type;
-	private ArrayList<ParameterUSP> parameters;
+	private ParametersUSP parameters;
 
-	public ConstraintUSP(String name, String type, ArrayList<ParameterUSP> parameters) {
+	public ConstraintUSP(String name, String type, ParametersUSP parameters) {
 		this.name = name;
 		this.type = type;
 		this.parameters = parameters;
@@ -29,11 +27,11 @@ public class ConstraintUSP {
 		this.type = type;
 	}
 
-	public ArrayList<ParameterUSP> getParameters() {
+	public ParametersUSP getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(ArrayList<ParameterUSP> parameters) {
+	public void setParameters(ParametersUSP parameters) {
 		this.parameters = parameters;
 	}
 

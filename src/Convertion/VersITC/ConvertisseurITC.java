@@ -31,6 +31,8 @@ import USP.Model.Timetabling;
 
 public class ConvertisseurITC {
 	static RulesUSP rules;
+	static int nbDaysPerWeek;
+	static int nbWeeks;
 
 	public static ProblemITC getProblem(Timetabling time) {
 		ArrayList<RoomITC> rooms = new ArrayList<>();
@@ -42,6 +44,8 @@ public class ConvertisseurITC {
 				time.getNrWeeks());
 		rules = new RulesUSP();
 		rules = time.getRules();
+		nbDaysPerWeek = Integer.parseInt(time.getNrDaysPerWeek());
+		nbWeeks = Integer.parseInt(time.getNrWeeks());
 
 		students = convertionStudents(students, time.getStudents());
 		rooms = convertionRooms(rooms, time.getRooms());
@@ -110,7 +114,6 @@ public class ConvertisseurITC {
 	private static ClassRoomsITC getClassRooms(String id, AllowedRoomsUSP alloRooms) {
 		ClassRoomsITC rooms = new ClassRoomsITC();
 		List<String> forbiddenRooms = rules.getForbidenRoomsClass(id);
-		System.out.println(id + " roomsforb:" + forbiddenRooms.toString());
 		for (AllowedRoomUSP room : alloRooms) {
 			if (!forbiddenRooms.contains(room.getRefId())) {
 				ClassRoomITC roomI = new ClassRoomITC(room.getRefId(), "0");
@@ -121,7 +124,9 @@ public class ConvertisseurITC {
 	}
 
 	private static TimesPenaltysITC getTimesPenaltyS(String id) {
-		TimesPenaltysITC times = new TimesPenaltysITC();
+		List<String> forbiddenPeriod = rules.getForbidenPeriodClass(id);
+		System.out.println(id + " period " + forbiddenPeriod.toString());
+		TimesPenaltysITC times = ConvertisseurTimes.convertForbiddenToTimes(forbiddenPeriod, nbDaysPerWeek, nbWeeks, 1);
 		return times;
 	}
 

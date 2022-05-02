@@ -6,7 +6,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class UtilParse {
+public class Util {
 	public static ArrayList<Element> getElements(NodeList list) {
 		ArrayList<Element> res = new ArrayList<>();
 		if (list != null) {
@@ -19,6 +19,10 @@ public class UtilParse {
 			}
 		}
 		return res;
+	}
+
+	public static int nbOccurrences(String maChaine, String recherche) {
+		return maChaine.length() - maChaine.replace(recherche, "").length();
 	}
 
 }

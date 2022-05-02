@@ -23,6 +23,7 @@ import USP.Model.CourseUSP;
 import USP.Model.FilterUSP;
 import USP.Model.GroupSolutionUSP;
 import USP.Model.ParameterUSP;
+import USP.Model.ParametersUSP;
 import USP.Model.PartUSP;
 import USP.Model.RoomUSP;
 import USP.Model.RuleUSP;
@@ -34,7 +35,7 @@ import USP.Model.SolutionUSP;
 import USP.Model.StudentUSP;
 import USP.Model.TeacherUSP;
 import USP.Model.Timetabling;
-import Utils.UtilParse;
+import Utils.Util;
 import Utils.Value_USP;
 
 public class ReadUSP {
@@ -76,7 +77,7 @@ public class ReadUSP {
 				String nrSlotsPerDay = ele.getAttribute(Value_USP.Attibute_NrSlotsPerDay);
 				timeTabling = new Timetabling(name, nrWeeks, nrDaysPerWeek, nrSlotsPerDay);
 				NodeList listes = ele.getChildNodes();
-				ArrayList<Element> list = UtilParse.getElements(listes);
+				ArrayList<Element> list = Util.getElements(listes);
 				for (Element element : list) {
 					switch (element.getTagName()) {
 					case "rooms":
@@ -117,13 +118,13 @@ public class ReadUSP {
 		ArrayList<GroupSolutionUSP> groups = new ArrayList<>();
 		ArrayList<SessionSolutionUSP> sessions = new ArrayList<>();
 		NodeList groupN = element.getElementsByTagName(Value_USP.Groups_Group);
-		ArrayList<Element> groupL = UtilParse.getElements(groupN);
+		ArrayList<Element> groupL = Util.getElements(groupN);
 		for (Element groupE : groupL) {
 			GroupSolutionUSP groupU = getGroupUSP(groupE);
 			groups.add(groupU);
 		}
 		NodeList sessionN = element.getElementsByTagName(Value_USP.SolutionSessions_Session);
-		ArrayList<Element> sessionL = UtilParse.getElements(sessionN);
+		ArrayList<Element> sessionL = Util.getElements(sessionN);
 		for (Element sessionE : sessionL) {
 			SessionSolutionUSP sessionU = getSessionUSP(sessionE);
 			sessions.add(sessionU);
@@ -148,13 +149,13 @@ public class ReadUSP {
 		ArrayList<String> students = new ArrayList<>();
 		ArrayList<String> classes = new ArrayList<>();
 		NodeList studentN = groupE.getElementsByTagName(Value_USP.SolutionStudents_Student);
-		ArrayList<Element> studentL = UtilParse.getElements(studentN);
+		ArrayList<Element> studentL = Util.getElements(studentN);
 		for (Element studentE : studentL) {
 			String ref = studentE.getAttribute(Value_USP.Attibute_RefId);
 			students.add(ref);
 		}
 		NodeList classN = groupE.getElementsByTagName(Value_USP.SolutionClasses_Class);
-		ArrayList<Element> classL = UtilParse.getElements(classN);
+		ArrayList<Element> classL = Util.getElements(classN);
 		for (Element classE : classL) {
 			String ref = classE.getAttribute(Value_USP.Attibute_RefId);
 			classes.add(ref);
@@ -164,12 +165,12 @@ public class ReadUSP {
 
 	private static void parseRules(Element element) {
 		NodeList ruleN = element.getElementsByTagName(Value_USP.Rules_Rule);
-		ArrayList<Element> ruleL = UtilParse.getElements(ruleN);
+		ArrayList<Element> ruleL = Util.getElements(ruleN);
 		for (Element ruleE : ruleL) {
 			SessionsRuleUSP sessions = new SessionsRuleUSP();
 			ConstraintsUSP constraints = new ConstraintsUSP();
 			NodeList sessionsN = ruleE.getElementsByTagName(Value_USP.Rule_Sessions);
-			ArrayList<Element> sessionL = UtilParse.getElements(sessionsN);
+			ArrayList<Element> sessionL = Util.getElements(sessionsN);
 			for (Element sessionE : sessionL) {
 				String groupBy = sessionE.getAttribute(Value_USP.Attibute_GroupBy);
 				String sessionMask = sessionE.getAttribute(Value_USP.Attibute_SessionsMask);
@@ -178,7 +179,7 @@ public class ReadUSP {
 				String notInSes = sessionE.getAttribute(Value_USP.Attibute_NotIn);
 				ArrayList<FilterUSP> filters = new ArrayList<>();
 				NodeList filterN = sessionE.getElementsByTagName(Value_USP.Sessions_Filter);
-				ArrayList<Element> filterL = UtilParse.getElements(filterN);
+				ArrayList<Element> filterL = Util.getElements(filterN);
 				for (Element filterE : filterL) {
 					String type = filterE.getAttribute(Value_USP.Attibute_Type);
 					String attributeNameFil = filterE.getAttribute(Value_USP.Attibute_AttributeName);
@@ -197,13 +198,13 @@ public class ReadUSP {
 				sessions.add(sessionU);
 			}
 			NodeList constraintN = ruleE.getElementsByTagName(Value_USP.Rule_Constraint);
-			ArrayList<Element> constraintL = UtilParse.getElements(constraintN);
+			ArrayList<Element> constraintL = Util.getElements(constraintN);
 			for (Element constraintE : constraintL) {
 				String name = constraintE.getAttribute(Value_USP.Attibute_Name);
 				String type = constraintE.getAttribute(Value_USP.Attibute_Type);
-				ArrayList<ParameterUSP> parameters = new ArrayList<>();
+				ParametersUSP parameters = new ParametersUSP();
 				NodeList paramN = constraintE.getElementsByTagName(Value_USP.Prameters_Parameter);
-				ArrayList<Element> paramL = UtilParse.getElements(paramN);
+				ArrayList<Element> paramL = Util.getElements(paramN);
 				for (Element paramE : paramL) {
 					String typeP = paramE.getAttribute(Value_USP.Attibute_Type);
 					String nameP = paramE.getAttribute(Value_USP.Attibute_Name);
@@ -223,13 +224,13 @@ public class ReadUSP {
 
 	private static void parseStudents(Element element) {
 		NodeList studentN = element.getElementsByTagName(Value_USP.Students_Student);
-		ArrayList<Element> studentL = UtilParse.getElements(studentN);
+		ArrayList<Element> studentL = Util.getElements(studentN);
 		for (Element studentE : studentL) {
 			String id = studentE.getAttribute(Value_USP.Attibute_Id);
 			String label = studentE.getAttribute(Value_USP.Attibute_Label);
 			ArrayList<String> courses = new ArrayList<>();
 			NodeList coursesN = studentE.getElementsByTagName(Value_USP.StudentCourses_Course);
-			ArrayList<Element> coursesL = UtilParse.getElements(coursesN);
+			ArrayList<Element> coursesL = Util.getElements(coursesN);
 			for (Element courseE : coursesL) {
 				String s = courseE.getAttribute(Value_USP.Attibute_RefId);
 				courses.add(s);
@@ -241,7 +242,7 @@ public class ReadUSP {
 
 	private static void parseCourses(Element element) {
 		NodeList courseN = element.getElementsByTagName(Value_USP.Courses_Course);
-		ArrayList<Element> courseL = UtilParse.getElements(courseN);
+		ArrayList<Element> courseL = Util.getElements(courseN);
 		for (Element courseE : courseL) {
 			CourseUSP cour = getCourse(courseE);
 			courses.add(cour);
@@ -254,7 +255,7 @@ public class ReadUSP {
 		ArrayList<PartUSP> parts = new ArrayList<>();
 
 		NodeList partN = e.getElementsByTagName(Value_USP.Course_Part);
-		ArrayList<Element> partL = UtilParse.getElements(partN);
+		ArrayList<Element> partL = Util.getElements(partN);
 		for (Element partE : partL) {
 			PartUSP PartU = getPartUSP(partE);
 			parts.add(PartU);
@@ -288,7 +289,7 @@ public class ReadUSP {
 		teacherU = getAllowedTeachers(teacher);
 
 		NodeList classeN = part.getElementsByTagName(Value_USP.Classes_Class);
-		ArrayList<Element> classeL = UtilParse.getElements(classeN);
+		ArrayList<Element> classeL = Util.getElements(classeN);
 		for (Element classeE : classeL) {
 			ClassUSP classU = getClassUSp(classeE);
 			classes.add(classU);
@@ -302,7 +303,7 @@ public class ReadUSP {
 		ArrayList<AllowedTeacher> teacherS = new ArrayList<>();
 
 		NodeList teacherN = teacher.getElementsByTagName(Value_USP.AllowedTeachers_Teacher);
-		ArrayList<Element> teacherL = UtilParse.getElements(teacherN);
+		ArrayList<Element> teacherL = Util.getElements(teacherN);
 		for (Element teacherE : teacherL) {
 			String ref = teacherE.getAttribute(Value_USP.Attibute_RefId);
 			String nrSessions = teacherE.getAttribute(Value_USP.Attibute_NrSessions);
@@ -316,7 +317,7 @@ public class ReadUSP {
 		AllowedRoomsUSP roomS = new AllowedRoomsUSP(sessionRooms);
 
 		NodeList roomN = room.getElementsByTagName(Value_USP.AllowedRooms_Room);
-		ArrayList<Element> roomL = UtilParse.getElements(roomN);
+		ArrayList<Element> roomL = Util.getElements(roomN);
 		for (Element roomE : roomL) {
 			String ref = roomE.getAttribute(Value_USP.Attibute_RefId);
 			String mandatory = roomE.getAttribute(Value_USP.Attibute_Mandatory);
@@ -329,7 +330,7 @@ public class ReadUSP {
 		String sessionLength = slot.getAttribute(Value_USP.Attibute_SessionLength);
 		String dailySlots = "", days = "", weeks = "";
 		NodeList listN = slot.getChildNodes();
-		ArrayList<Element> listL = UtilParse.getElements(listN);
+		ArrayList<Element> listL = Util.getElements(listN);
 		for (Element listE : listL) {
 			switch (listE.getTagName()) {
 			case "dailySlots":
@@ -357,7 +358,7 @@ public class ReadUSP {
 
 	private static void parseTeachers(Element element) {
 		NodeList teacherN = element.getElementsByTagName(Value_USP.AllowedTeachers_Teacher);
-		ArrayList<Element> teacherL = UtilParse.getElements(teacherN);
+		ArrayList<Element> teacherL = Util.getElements(teacherN);
 		for (Element teacherE : teacherL) {
 			String id = teacherE.getAttribute(Value_USP.Attibute_Id);
 			String label = teacherE.getAttribute(Value_USP.Attibute_Label);
@@ -369,7 +370,7 @@ public class ReadUSP {
 
 	private static void parseRooms(Element element) {
 		NodeList roomN = element.getElementsByTagName(Value_USP.Rooms_Room);
-		ArrayList<Element> roomL = UtilParse.getElements(roomN);
+		ArrayList<Element> roomL = Util.getElements(roomN);
 		for (Element roomE : roomL) {
 			String id = roomE.getAttribute(Value_USP.Attibute_Id);
 			String capacity = roomE.getAttribute(Value_USP.Attibute_Capacity);

@@ -23,6 +23,7 @@ import USP.Model.ConstraintsUSP;
 import USP.Model.CourseUSP;
 import USP.Model.FilterUSP;
 import USP.Model.ParameterUSP;
+import USP.Model.ParametersUSP;
 import USP.Model.PartUSP;
 import USP.Model.RoomUSP;
 import USP.Model.RuleUSP;
@@ -90,7 +91,7 @@ public class ConvertisseurUSP {
 					session.setAttributeName("id");
 					session.setIn(classe.getId());
 					sessions.add(session);
-					ArrayList<ParameterUSP> parameters = new ArrayList<>();
+					ParametersUSP parameters = new ParametersUSP();
 					ParameterUSP param1 = new ParameterUSP("first");
 					param1.setType("slot");
 					param1.setValue(forbidSplit[0]);
@@ -99,7 +100,7 @@ public class ConvertisseurUSP {
 					param2.setValue(forbidSplit[1]);
 					parameters.add(param1);
 					parameters.add(param2);
-					ConstraintUSP cons = new ConstraintUSP("ForbiddenPeriod", "hard", parameters);
+					ConstraintUSP cons = new ConstraintUSP("forbiddenPeriod", "hard", parameters);
 					constraints.add(cons);
 					RuleUSP rule = new RuleUSP(sessions, constraints);
 					rules.add(rule);
@@ -128,7 +129,7 @@ public class ConvertisseurUSP {
 				filters.add(filter);
 				SessionRuleUSP session = new SessionRuleUSP("courses", filters);
 				sessions.add(session);
-				ConstraintUSP cons = new ConstraintUSP("disjunctive", "hard", new ArrayList<>());
+				ConstraintUSP cons = new ConstraintUSP("disjunctive", "hard", new ParametersUSP());
 				constraints.add(cons);
 				RuleUSP rule = new RuleUSP(sessions, constraints);
 				rules.add(rule);
@@ -184,7 +185,7 @@ public class ConvertisseurUSP {
 		session.setAttributeName("id");
 		session.setIn(id);
 		sessions.add(session);
-		ArrayList<ParameterUSP> parameters = new ArrayList<>();
+		ParametersUSP parameters = new ParametersUSP();
 		ConstraintUSP cons = new ConstraintUSP("sameDaySlot", "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
@@ -201,7 +202,7 @@ public class ConvertisseurUSP {
 		filters.add(filter);
 		SessionRuleUSP session = new SessionRuleUSP("class", filters);
 		sessions.add(session);
-		ArrayList<ParameterUSP> parameters = new ArrayList<>();
+		ParametersUSP parameters = new ParametersUSP();
 		ParameterUSP param1 = new ParameterUSP("value");
 		param1.setType("slots");
 		param1.setValue(clas.getNbSessionWeek() + "");
@@ -252,7 +253,7 @@ public class ConvertisseurUSP {
 				session.setAttributeName("id");
 				session.setIn(classe.getId());
 				sessions.add(session);
-				ArrayList<ParameterUSP> parameters = new ArrayList<>();
+				ParametersUSP parameters = new ParametersUSP();
 				ParameterUSP param = new ParameterUSP("rooms");
 				param.setType("ids");
 				param.setValue(idrooms);
