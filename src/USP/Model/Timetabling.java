@@ -11,7 +11,7 @@ public class Timetabling {
 	private ArrayList<TeacherUSP> teachers = new ArrayList<>();
 	private ArrayList<CourseUSP> courses = new ArrayList<>();
 	private ArrayList<StudentUSP> students = new ArrayList<>();
-	private ArrayList<RuleUSP> rules = new ArrayList<>();
+	private RulesUSP rules = new RulesUSP();
 	private ArrayList<EquipmentUSP> equipments = new ArrayList<>();
 	private SolutionUSP solution;
 
@@ -87,11 +87,11 @@ public class Timetabling {
 		this.students = students;
 	}
 
-	public ArrayList<RuleUSP> getRules() {
+	public RulesUSP getRules() {
 		return rules;
 	}
 
-	public void setRules(ArrayList<RuleUSP> rules) {
+	public void setRules(RulesUSP rules) {
 		this.rules = rules;
 	}
 

@@ -1,21 +1,19 @@
 package USP.Model;
 
-import java.util.ArrayList;
-
 public class RuleUSP {
-	private ArrayList<SessionRuleUSP> sessions;
+	private SessionsRuleUSP sessions;
 	private ConstraintsUSP constraint;
 
-	public RuleUSP(ArrayList<SessionRuleUSP> sessions, ConstraintsUSP constraint) {
+	public RuleUSP(SessionsRuleUSP sessions, ConstraintsUSP constraint) {
 		this.sessions = sessions;
 		this.constraint = constraint;
 	}
 
-	public ArrayList<SessionRuleUSP> getSessions() {
+	public SessionsRuleUSP getSessions() {
 		return sessions;
 	}
 
-	public void setSessions(ArrayList<SessionRuleUSP> sessions) {
+	public void setSessions(SessionsRuleUSP sessions) {
 		this.sessions = sessions;
 	}
 

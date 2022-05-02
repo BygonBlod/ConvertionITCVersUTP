@@ -26,8 +26,10 @@ import USP.Model.ParameterUSP;
 import USP.Model.PartUSP;
 import USP.Model.RoomUSP;
 import USP.Model.RuleUSP;
+import USP.Model.RulesUSP;
 import USP.Model.SessionRuleUSP;
 import USP.Model.SessionSolutionUSP;
+import USP.Model.SessionsRuleUSP;
 import USP.Model.SolutionUSP;
 import USP.Model.StudentUSP;
 import USP.Model.TeacherUSP;
@@ -41,7 +43,7 @@ public class ReadUSP {
 	static ArrayList<TeacherUSP> teachers;
 	static ArrayList<CourseUSP> courses;
 	static ArrayList<StudentUSP> students;
-	static ArrayList<RuleUSP> rules;
+	static RulesUSP rules;
 	static SolutionUSP solution;
 
 	public static Timetabling getTimeTabling(String args) {
@@ -49,7 +51,7 @@ public class ReadUSP {
 		teachers = new ArrayList<>();
 		courses = new ArrayList<>();
 		students = new ArrayList<>();
-		rules = new ArrayList<>();
+		rules = new RulesUSP();
 		solution = new SolutionUSP();
 		Document document = null;
 		DocumentBuilderFactory factory = null;
@@ -164,7 +166,7 @@ public class ReadUSP {
 		NodeList ruleN = element.getElementsByTagName(Value_USP.Rules_Rule);
 		ArrayList<Element> ruleL = UtilParse.getElements(ruleN);
 		for (Element ruleE : ruleL) {
-			ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
+			SessionsRuleUSP sessions = new SessionsRuleUSP();
 			ConstraintsUSP constraints = new ConstraintsUSP();
 			NodeList sessionsN = ruleE.getElementsByTagName(Value_USP.Rule_Sessions);
 			ArrayList<Element> sessionL = UtilParse.getElements(sessionsN);

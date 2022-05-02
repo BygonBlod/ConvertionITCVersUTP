@@ -1,6 +1,7 @@
 package Convertion.VersITC;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ITC.Model.ClassITC;
 import ITC.Model.ClassRoomITC;
@@ -23,11 +24,13 @@ import USP.Model.FilterUSP;
 import USP.Model.PartUSP;
 import USP.Model.RoomUSP;
 import USP.Model.RuleUSP;
+import USP.Model.RulesUSP;
 import USP.Model.SessionRuleUSP;
 import USP.Model.StudentUSP;
 import USP.Model.Timetabling;
 
 public class ConvertisseurITC {
+	static RulesUSP rules;
 
 	public static ProblemITC getProblem(Timetabling time) {
 		ArrayList<RoomITC> rooms = new ArrayList<>();
@@ -37,6 +40,8 @@ public class ConvertisseurITC {
 		OptimizationITC optimization = new OptimizationITC("", "", "", "");
 		ProblemITC problem = new ProblemITC(time.getName(), time.getNrDaysPerWeek(), time.getNrSlotsPerDay(),
 				time.getNrWeeks());
+		rules = new RulesUSP();
+		rules = time.getRules();
 
 		students = convertionStudents(students, time.getStudents());
 		rooms = convertionRooms(rooms, time.getRooms());
@@ -55,7 +60,7 @@ public class ConvertisseurITC {
 			ArrayList<RuleUSP> rules) {
 		for (RuleUSP rule : rules) {
 			ArrayList<String> classes = new ArrayList<>();
-			if (rule.getConstraint().containsCons("disjunctive", "hard")) {
+			if (rule.getConstraint().containsCons("disjunctive", "hard") > -1) {
 				for (SessionRuleUSP session : rule.getSessions()) {
 					if (session.getGroupBy().equals("courses")) {
 						for (FilterUSP filter : session.getFilter()) {
@@ -86,14 +91,9 @@ public class ConvertisseurITC {
 			for (PartUSP part : course.getParts()) {
 				ClassesITC classes = new ClassesITC();
 				for (ClassUSP classe : part.getClasses()) {
-					ClassRoomsITC rooms = new ClassRoomsITC();
-					AllowedRoomsUSP alloRooms = part.getRoom();
-					for (AllowedRoomUSP room : alloRooms) {
-						ClassRoomITC roomI = new ClassRoomITC(room.getRefId(), "");
-						rooms.add(roomI);
-					}
-					ClassITC classI = new ClassITC(classe.getId(), classe.getMaxHeadCount(), rooms,
-							new TimesPenaltysITC());
+					ClassRoomsITC rooms = getClassRooms(classe.getId(), part.getRoom());
+					TimesPenaltysITC times = getTimesPenaltyS(classe.getId());
+					ClassITC classI = new ClassITC(classe.getId(), classe.getMaxHeadCount(), rooms, times);
 					classI.setParent(classe.getParent());
 					classes.add(classI);
 				}
@@ -105,6 +105,24 @@ public class ConvertisseurITC {
 			coursesItc.add(courseI);
 		}
 		return coursesItc;
+	}
+
+	private static ClassRoomsITC getClassRooms(String id, AllowedRoomsUSP alloRooms) {
+		ClassRoomsITC rooms = new ClassRoomsITC();
+		List<String> forbiddenRooms = rules.getForbidenRoomsClass(id);
+		System.out.println(id + " roomsforb:" + forbiddenRooms.toString());
+		for (AllowedRoomUSP room : alloRooms) {
+			if (!forbiddenRooms.contains(room.getRefId())) {
+				ClassRoomITC roomI = new ClassRoomITC(room.getRefId(), "0");
+				rooms.add(roomI);
+			}
+		}
+		return rooms;
+	}
+
+	private static TimesPenaltysITC getTimesPenaltyS(String id) {
+		TimesPenaltysITC times = new TimesPenaltysITC();
+		return times;
 	}
 
 	private static ArrayList<RoomITC> convertionRooms(ArrayList<RoomITC> roomsItc, ArrayList<RoomUSP> roomsUsp) {

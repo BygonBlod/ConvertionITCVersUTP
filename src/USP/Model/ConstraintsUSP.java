@@ -7,13 +7,15 @@ public class ConstraintsUSP extends ArrayList<ConstraintUSP> {
 		super();
 	}
 
-	public boolean containsCons(String name, String type) {
+	public int containsCons(String name, String type) {
+		int res = 0;
 		for (ConstraintUSP constraint : this) {
 			if (constraint.getName().equals(name) && constraint.getType().equals(type)) {
-				return true;
+				return res;
 			}
+			res++;
 		}
-		return false;
+		return -1;
 	}
 
 }

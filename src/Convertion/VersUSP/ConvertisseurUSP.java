@@ -26,7 +26,9 @@ import USP.Model.ParameterUSP;
 import USP.Model.PartUSP;
 import USP.Model.RoomUSP;
 import USP.Model.RuleUSP;
+import USP.Model.RulesUSP;
 import USP.Model.SessionRuleUSP;
+import USP.Model.SessionsRuleUSP;
 import USP.Model.SolutionUSP;
 import USP.Model.StudentUSP;
 import USP.Model.TeacherUSP;
@@ -35,7 +37,7 @@ import USP.Model.Timetabling;
 public class ConvertisseurUSP {
 	private static boolean unionroom = false;
 	private static boolean multipleConfig = false;
-	private static ArrayList<RuleUSP> rules;
+	private static RulesUSP rules;
 	private static int slot;
 	private static int nbDays;
 
@@ -46,7 +48,7 @@ public class ConvertisseurUSP {
 		ArrayList<TeacherUSP> teachers = new ArrayList<>();
 		ArrayList<CourseUSP> courses = new ArrayList<>();
 		ArrayList<StudentUSP> students = new ArrayList<>();
-		rules = new ArrayList<>();
+		rules = new RulesUSP();
 		SolutionUSP solution;
 		slot = Integer.parseInt(problem.getNrDays()) * Integer.parseInt(problem.getNrWeeks());
 		nbDays = Integer.parseInt(problem.getNrDays());
@@ -71,17 +73,17 @@ public class ConvertisseurUSP {
 	private static void setForbiddenPeriod(SubpartITC sub) {
 		int start = (sub.getFirstWeek(sub.getAllTimes()) - 1) * 1440 * nbDays;
 		int end = sub.getLastWeek(sub.getAllTimes()) * 1440 * nbDays;
-		System.out.println("sub id:" + sub.getId());
+		// System.out.println("sub id:" + sub.getId());
 		for (ClassITC classe : sub.getClas()) {
 			ArrayList<String> forbidden = classe.getForbiddenPeriod(start, end);
-			System.out.println("	" + classe.getId() + ": " + forbidden.toString());
+			// System.out.println(" " + classe.getId() + ": " + forbidden.toString());
 
 			int nbTest = 0;
 			for (String forbid : forbidden) {
 				String[] forbidSplit = forbid.split("-");
 				if (forbidSplit.length == 2) {
 					nbTest++;
-					ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
+					SessionsRuleUSP sessions = new SessionsRuleUSP();
 					ConstraintsUSP constraints = new ConstraintsUSP();
 					ArrayList<FilterUSP> filters = new ArrayList<>();
 					SessionRuleUSP session = new SessionRuleUSP("class", filters);
@@ -118,7 +120,7 @@ public class ConvertisseurUSP {
 					s += classe + ",";
 				}
 				s = s.substring(0, s.length() - 1);
-				ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
+				SessionsRuleUSP sessions = new SessionsRuleUSP();
 				ConstraintsUSP constraints = new ConstraintsUSP();
 				ArrayList<FilterUSP> filters = new ArrayList<>();
 				FilterUSP filter = new FilterUSP("class", "id");
@@ -175,7 +177,7 @@ public class ConvertisseurUSP {
 	}
 
 	private static void setSameDaySlot(String id) {
-		ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ArrayList<FilterUSP> filters = new ArrayList<>();
 		SessionRuleUSP session = new SessionRuleUSP("class", filters);
@@ -191,7 +193,7 @@ public class ConvertisseurUSP {
 	}
 
 	private static void setPeriodic(ClassITC clas) {
-		ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ArrayList<FilterUSP> filters = new ArrayList<>();
 		FilterUSP filter = new FilterUSP("class", "id");
@@ -243,7 +245,7 @@ public class ConvertisseurUSP {
 		for (ClassITC classe : clas) {
 			String idrooms = inintersection(rooms, classe.getRooms());
 			if (!idrooms.equals("")) {
-				ArrayList<SessionRuleUSP> sessions = new ArrayList<>();
+				SessionsRuleUSP sessions = new SessionsRuleUSP();
 				ConstraintsUSP constraints = new ConstraintsUSP();
 				ArrayList<FilterUSP> filters = new ArrayList<>();
 				SessionRuleUSP session = new SessionRuleUSP("class", filters);
