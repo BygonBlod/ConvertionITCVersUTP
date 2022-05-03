@@ -8,6 +8,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,16 +48,21 @@ public class ReadITC {
 	static ArrayList<CourseITC> courses = new ArrayList<>();
 	static ProblemITC problem;
 	static OptimizationITC optimization;
+
+	// pour récupérer ce qui peut poser problème
 	static boolean ajout = false;
 	static String filename;
 	public static int nbFile = 0;
 	public static HashMap<String, Integer> nbContraintes = new HashMap<>();
+	public static HashMap<String, Integer> nbContraintesMax = new HashMap<>();
+	public static HashMap<String, ArrayList<String>> nbContraintesFiles = new HashMap<>();
 	static ArrayList<String> lignes;
 
 	public static ProblemITC getProblem(String args, boolean mul) {
-		filename = args;
+		filename = args.substring(args.indexOf("/") + 1);
 		ajout = false;
 		lignes = new ArrayList<>();
+		nbContraintes = new HashMap<>();
 		rooms = new ArrayList<>();
 		distributions = new ArrayList<>();
 		students = new ArrayList<>();
@@ -127,6 +136,23 @@ public class ReadITC {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+		Path fichier = Paths.get("nbContraintes.txt");
+		HashMap<String, Integer> x = nbContraintes.entrySet().stream()
+				.sorted((i1, i2) -> i1.getKey().compareTo(i2.getKey()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (z1, z2) -> z1, LinkedHashMap::new));
+
+		lignes = new ArrayList<>();
+		Set<String> keys = x.keySet();
+		try {
+			for (String s : keys) {
+				lignes.add(s + " - " + x.get(s));
+				lignes.add("");
+			}
+			lignes.add(0, filename + " :" + x.size());
+			Files.write(fichier, lignes, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return problem;
 	}
@@ -226,6 +252,7 @@ public class ReadITC {
 		String daysCla = clas.getAttribute("days");
 		String startCla = clas.getAttribute("start");
 		String weeksCla = clas.getAttribute("weeks");
+		String lengthClas = clas.getAttribute("length");
 		ClassRoomsITC rooms = new ClassRoomsITC();
 		TimesPenaltysITC times = new TimesPenaltysITC();
 		NodeList roomN = clas.getElementsByTagName("room");
@@ -241,6 +268,9 @@ public class ReadITC {
 			String days = time.getAttribute("days");
 			String start = time.getAttribute("start");
 			String length = time.getAttribute("length");
+			if (length.equals("") && !lengthClas.equals("")) {
+				length = lengthClas;
+			}
 			String weeks = time.getAttribute("weeks");
 			String penaltys = time.getAttribute("penalty");
 			times.add(new TimesPenaltyITC(days, start, length, weeks, penaltys));
@@ -310,11 +340,34 @@ public class ReadITC {
 	}
 
 	private static void addContraintes(String type) {
-		Integer value = nbContraintes.get(type);
-		if (value == null) {
-			nbContraintes.put(type, 1);
+		String typeWithoutParentheses = "";
+		if (Utils.Util.nbOccurrences(type, "(") > 0) {
+			String split = type.substring(0, type.indexOf('('));
+
+			typeWithoutParentheses = split;
 		} else {
-			nbContraintes.put(type, nbContraintes.get(type) + 1);
+			typeWithoutParentheses = type;
+		}
+		Integer value = nbContraintes.get(typeWithoutParentheses);
+		if (value == null) {
+			nbContraintes.put(typeWithoutParentheses, 1);
+		} else {
+			nbContraintes.put(typeWithoutParentheses, value + 1);
+		}
+		Integer value2 = nbContraintesMax.get(typeWithoutParentheses);
+		if (value2 == null) {
+			nbContraintesMax.put(typeWithoutParentheses, 1);
+			ArrayList<String> array = new ArrayList<>();
+			array.add(filename);
+			nbContraintesFiles.put(typeWithoutParentheses, array);
+		} else {
+			nbContraintesMax.put(typeWithoutParentheses, value2 + 1);
+			ArrayList<String> array = nbContraintesFiles.get(typeWithoutParentheses);
+			if (!array.contains(filename)) {
+				array.add(filename);
+				nbContraintesFiles.put(typeWithoutParentheses, array);
+			}
+
 		}
 
 	}

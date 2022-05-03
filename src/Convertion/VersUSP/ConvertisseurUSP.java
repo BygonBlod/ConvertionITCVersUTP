@@ -1,5 +1,11 @@
 package Convertion.VersUSP;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
 import ITC.Model.ClassITC;
@@ -41,10 +47,14 @@ public class ConvertisseurUSP {
 	private static RulesUSP rules;
 	private static int slot;
 	private static int nbDays;
+	private static int nbSlots;
+	private static int nbSlotsF;
 
 	public static Timetabling getTimeTabling(ProblemITC problem, boolean unionR, boolean multiple) {
 		unionroom = unionR;
 		multipleConfig = multiple;
+		nbSlots = 0;
+		nbSlotsF = 0;
 		ArrayList<RoomUSP> rooms = new ArrayList<>();
 		ArrayList<TeacherUSP> teachers = new ArrayList<>();
 		ArrayList<CourseUSP> courses = new ArrayList<>();
@@ -68,22 +78,28 @@ public class ConvertisseurUSP {
 		time.setSolution(solution);
 		time.setStudents(students);
 		time.setTeachers(teachers);
+
+		ArrayList<String> lignes = new ArrayList<>();
+		Path fichier = Paths.get("nbInstancesSlots.txt");
+		try {
+			lignes.add(time.getName());
+			lignes.add(nbSlotsF + " / " + nbSlots);
+			lignes.add("\n");
+			Files.write(fichier, lignes, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return time;
 	}
 
 	private static void setForbiddenPeriod(SubpartITC sub) {
 		int start = (sub.getFirstWeek(sub.getAllTimes()) - 1) * 1440 * nbDays;
 		int end = sub.getLastWeek(sub.getAllTimes()) * 1440 * nbDays;
-		// System.out.println("sub id:" + sub.getId());
 		for (ClassITC classe : sub.getClas()) {
 			ArrayList<String> forbidden = classe.getForbiddenPeriod(start, end);
-			// System.out.println(" " + classe.getId() + ": " + forbidden.toString());
-
-			int nbTest = 0;
 			for (String forbid : forbidden) {
 				String[] forbidSplit = forbid.split("-");
 				if (forbidSplit.length == 2) {
-					nbTest++;
 					SessionsRuleUSP sessions = new SessionsRuleUSP();
 					ConstraintsUSP constraints = new ConstraintsUSP();
 					ArrayList<FilterUSP> filters = new ArrayList<>();
@@ -106,21 +122,20 @@ public class ConvertisseurUSP {
 					rules.add(rule);
 				}
 			}
-			if (nbTest == forbidden.size()) {
-				// System.out.println("bon");
-			}
-
 		}
 	}
 
 	private static void convertionDistibution(ArrayList<DistributionITC> distributions) {
+		int nb = 0;
 		for (DistributionITC distrib : distributions) {
 			if (distrib.getType().equals("SameAttendees") && distrib.getRequired().equals("true")) {
 				String s = "";
 				for (String classe : distrib.getClassId()) {
 					s += classe + ",";
 				}
-				s = s.substring(0, s.length() - 1);
+				if (s.length() > 1) {
+					s = s.substring(0, s.length() - 1);
+				}
 				SessionsRuleUSP sessions = new SessionsRuleUSP();
 				ConstraintsUSP constraints = new ConstraintsUSP();
 				ArrayList<FilterUSP> filters = new ArrayList<>();
@@ -150,8 +165,14 @@ public class ConvertisseurUSP {
 							if (clas.checkWeeks()) {
 								setPeriodic(clas);
 							}
+
 							if (clas.getTimes().size() > 0) {
-								setSameDaySlot(clas.getId());
+								String days = clas.getTimes().get(0).getDays();
+								if (Utils.Util.nbOccurrences(days, "1") == 1) {
+									setSameSlot(clas.getId(), "sameWeeklySlot");
+								} else {
+									setSameSlot(clas.getId(), "sameDailySlot");
+								}
 							}
 							ClassUSP clasU = new ClassUSP(clas.getId(), clas.getLimit());
 							clasU.setParent(clas.getParent());
@@ -177,7 +198,7 @@ public class ConvertisseurUSP {
 		return coursesUsp;
 	}
 
-	private static void setSameDaySlot(String id) {
+	private static void setSameSlot(String id, String type) {
 		SessionsRuleUSP sessions = new SessionsRuleUSP();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ArrayList<FilterUSP> filters = new ArrayList<>();
@@ -186,7 +207,7 @@ public class ConvertisseurUSP {
 		session.setIn(id);
 		sessions.add(session);
 		ParametersUSP parameters = new ParametersUSP();
-		ConstraintUSP cons = new ConstraintUSP("sameDaySlot", "hard", parameters);
+		ConstraintUSP cons = new ConstraintUSP(type, "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
 		rules.add(rule);
@@ -222,6 +243,7 @@ public class ConvertisseurUSP {
 		String weeks = sub.getWeeksLSD();
 		if (sub.sameTimesLSD(sub.getId()) && sub.getAllTimes().size() > 0 && !weeks.equals("")) {
 			TimesPenaltyITC time = sub.getAllTimes().get(0);
+			nbSlotsF++;
 			// System.out.println(sub.getId());
 			slots.setDailySlots(time.getStartUSP());
 			slots.setSessionLength(time.getLengthUSP());
@@ -229,7 +251,7 @@ public class ConvertisseurUSP {
 			slots.setWeeks(weeks);
 			setForbiddenPeriod(sub);
 		}
-
+		nbSlots++;
 		return slots;
 	}
 

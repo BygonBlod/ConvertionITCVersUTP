@@ -8,8 +8,16 @@ public class TimesITC {
 
 	public TimesITC(String days, String start, String length, String weeks) {
 		this.days = days;
-		this.start = start;
-		this.length = length;
+		if (start.contentEquals("")) {
+			this.start = "0";
+		} else {
+			this.start = start;
+		}
+		if (length.contentEquals("")) {
+			this.length = "0";
+		} else {
+			this.length = length;
+		}
 		this.weeks = weeks;
 	}
 
