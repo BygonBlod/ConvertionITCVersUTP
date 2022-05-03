@@ -100,4 +100,20 @@ public class TimesPenaltyITC extends TimesITC {
 		return res;
 	}
 
+	public ArrayList<Integer> getDayUSP() {
+		ArrayList<Integer> res = new ArrayList<>();
+		String days = getDays();
+		for (int i = 0; i < days.length(); i++) {
+			if (days.charAt(i) == '1') {
+				res.add(i + 1);
+			}
+		}
+		return res;
+	}
+
+	public int getNbSes() {
+		int res = Utils.Util.nbOccurrences(getDays(), "1") * Utils.Util.nbOccurrences(getWeeks(), "1");
+		return res;
+	}
+
 }

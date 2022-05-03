@@ -81,7 +81,6 @@ public class TimesPenaltysITC extends ArrayList<TimesPenaltyITC> {
 	}
 
 	private void addDays(ArrayList<String> days, String days2, int nbSesPerWeek) {
-		// TODO Auto-generated method stub
 
 	}
 

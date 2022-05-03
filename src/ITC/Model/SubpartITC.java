@@ -23,7 +23,7 @@ public class SubpartITC {
 		return res;
 	}
 
-	public boolean sameTimesLSD(String i) {
+	public boolean sameTimesLSD() {
 		TimesPenaltysITC times = getAllTimes();
 		String length = "";
 		String start = "";
@@ -37,6 +37,23 @@ public class SubpartITC {
 				if (!length.equals(time.getLength()) || !start.equals(time.getStart())
 						|| !days.equals(time.getDays())) {
 					// if sur les consécutives
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public boolean sameTimesNb() {
+		TimesPenaltysITC times = getAllTimes();
+		String length = "";
+		int nbSes = 0;
+		for (TimesPenaltyITC time : times) {
+			if (length.equals("")) {
+				length = time.getLength();
+				nbSes = time.getNbSes();
+			} else {
+				if (!length.equals(time.getLength()) || nbSes != time.getNbSes()) {
 					return false;
 				}
 			}
@@ -106,5 +123,43 @@ public class SubpartITC {
 
 	public void setClas(ClassesITC clas) {
 		this.clas = clas;
+	}
+
+	public String getStartUSP() {
+		String s = "";
+		TimesPenaltysITC times = getAllTimes();
+		for (TimesPenaltyITC time : times) {
+			if (!s.contains(time.getStartUSP() + ",")) {
+				s += time.getStartUSP() + ",";
+			}
+		}
+		if (s.length() > 1) {
+			s = s.substring(0, s.length() - 1);
+		}
+		return s;
+	}
+
+	public String getDaysUSP(String i) {
+
+		TimesPenaltysITC times = getAllTimes();
+		ArrayList<Integer> daysInt = new ArrayList<>();
+		for (TimesPenaltyITC time : times) {
+			ArrayList<Integer> timeDay = time.getDayUSP();
+			for (int j = 0; j < timeDay.size(); j++) {
+				if (!daysInt.contains(timeDay.get(j))) {
+					daysInt.add(timeDay.get(j));
+				}
+			}
+		}
+
+		daysInt.sort(null);
+		String res = "";
+		for (int st : daysInt) {
+			res += st + ",";
+		}
+		if (res.length() > 0) {
+			res = res.substring(0, res.length() - 1);
+		}
+		return res;
 	}
 }

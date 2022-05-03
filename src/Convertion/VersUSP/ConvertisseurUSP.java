@@ -38,6 +38,7 @@ import USP.Model.SessionRuleUSP;
 import USP.Model.SessionsRuleUSP;
 import USP.Model.SolutionUSP;
 import USP.Model.StudentUSP;
+import USP.Model.StudentsUSP;
 import USP.Model.TeacherUSP;
 import USP.Model.Timetabling;
 
@@ -45,6 +46,7 @@ public class ConvertisseurUSP {
 	private static boolean unionroom = false;
 	private static boolean multipleConfig = false;
 	private static RulesUSP rules;
+	private static StudentsUSP students;
 	private static int slot;
 	private static int nbDays;
 	private static int nbSlots;
@@ -58,7 +60,7 @@ public class ConvertisseurUSP {
 		ArrayList<RoomUSP> rooms = new ArrayList<>();
 		ArrayList<TeacherUSP> teachers = new ArrayList<>();
 		ArrayList<CourseUSP> courses = new ArrayList<>();
-		ArrayList<StudentUSP> students = new ArrayList<>();
+		students = new StudentsUSP();
 		rules = new RulesUSP();
 		SolutionUSP solution;
 		slot = Integer.parseInt(problem.getNrDays()) * Integer.parseInt(problem.getNrWeeks());
@@ -126,7 +128,6 @@ public class ConvertisseurUSP {
 	}
 
 	private static void convertionDistibution(ArrayList<DistributionITC> distributions) {
-		int nb = 0;
 		for (DistributionITC distrib : distributions) {
 			if (distrib.getType().equals("SameAttendees") && distrib.getRequired().equals("true")) {
 				String s = "";
@@ -157,6 +158,9 @@ public class ConvertisseurUSP {
 		for (CourseITC course : coursesItc) {
 			if (course.getConfig().size() == 1 || course.differentTimes4()) {
 				int i = 0;
+				if (course.getConfig().size() > 1) {
+
+				}
 				for (ConfigITC conf : course.getConfig()) {
 					ArrayList<PartUSP> parts = new ArrayList<>();
 					for (SubpartITC sub : conf.getSubpart()) {
@@ -241,13 +245,13 @@ public class ConvertisseurUSP {
 	private static AllowedSlotsUSP getAllowedSlots(SubpartITC sub) {
 		AllowedSlotsUSP slots = new AllowedSlotsUSP("", "", "", "");
 		String weeks = sub.getWeeksLSD();
-		if (sub.sameTimesLSD(sub.getId()) && sub.getAllTimes().size() > 0 && !weeks.equals("")) {
+		if ((sub.sameTimesNb() || sub.sameTimesLSD()) && sub.getAllTimes().size() > 0 && !weeks.equals("")) {
 			TimesPenaltyITC time = sub.getAllTimes().get(0);
 			nbSlotsF++;
 			// System.out.println(sub.getId());
-			slots.setDailySlots(time.getStartUSP());
+			slots.setDailySlots(sub.getStartUSP());
 			slots.setSessionLength(time.getLengthUSP());
-			slots.setDays(time.getDaysUSP());
+			slots.setDays(sub.getDaysUSP(sub.getId()));
 			slots.setWeeks(weeks);
 			setForbiddenPeriod(sub);
 		}
@@ -313,8 +317,7 @@ public class ConvertisseurUSP {
 		return roomsUsp;
 	}
 
-	private static ArrayList<StudentUSP> convertionStudents(ArrayList<StudentUSP> studentsUsp,
-			ArrayList<StudentITC> studentsItc) {
+	private static StudentsUSP convertionStudents(StudentsUSP studentsUsp, ArrayList<StudentITC> studentsItc) {
 		for (StudentITC stud : studentsItc) {
 			StudentUSP student = new StudentUSP(stud.getId(), "", stud.getCourses());
 			studentsUsp.add(student);
