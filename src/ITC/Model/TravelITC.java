@@ -9,6 +9,13 @@ public class TravelITC {
 		this.value = value;
 	}
 
+	public String toString() {
+		String res = "";
+		res += room + " ";
+		res += value;
+		return res;
+	}
+
 	public String getRoom() {
 		return room;
 	}

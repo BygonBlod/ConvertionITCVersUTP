@@ -16,6 +16,7 @@ import ITC.Model.RoomITC;
 import ITC.Model.StudentITC;
 import ITC.Model.SubpartITC;
 import ITC.Model.TimesPenaltysITC;
+import ITC.Model.TravelsITC;
 import USP.Model.AllowedRoomUSP;
 import USP.Model.AllowedRoomsUSP;
 import USP.Model.ClassUSP;
@@ -132,7 +133,7 @@ public class ConvertisseurITC {
 
 	private static ArrayList<RoomITC> convertionRooms(ArrayList<RoomITC> roomsItc, ArrayList<RoomUSP> roomsUsp) {
 		for (RoomUSP roomU : roomsUsp) {
-			RoomITC room = new RoomITC(roomU.getId(), new ArrayList<>(), roomU.getCapacity(), new ArrayList<>());
+			RoomITC room = new RoomITC(roomU.getId(), new TravelsITC(), roomU.getCapacity(), new ArrayList<>());
 			roomsItc.add(room);
 		}
 		return roomsItc;

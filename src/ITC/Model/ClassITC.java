@@ -194,4 +194,11 @@ public class ClassITC {
 		return res;
 	}
 
+	public String getNrSession() {
+		if (times.size() > 0) {
+			return times.get(0).getNbSes() + "";
+		}
+		return "";
+	}
+
 }

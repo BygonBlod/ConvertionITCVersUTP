@@ -163,4 +163,9 @@ public class SubpartITC {
 		return res;
 	}
 
+	public String getNrSession() {
+		int res = getAllTimes().get(0).getNbSes();
+		return res + "";
+	}
+
 }

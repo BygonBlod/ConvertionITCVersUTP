@@ -13,6 +13,7 @@ import ITC.Model.RoomITC;
 import ITC.Model.StudentITC;
 import ITC.Model.SubpartITC;
 import ITC.Model.TimesPenaltyITC;
+import ITC.Model.TravelsITC;
 import USP.Model.AllowedRoomUSP;
 import USP.Model.AllowedRoomsUSP;
 import USP.Model.AllowedSlotsUSP;
@@ -41,6 +42,7 @@ public class ConvertisseurUSP {
 	private static boolean multipleConfig = false;
 	private static RulesUSP rules;
 	private static StudentsUSP students;
+	private static String vectorTravel;
 	private static int slot;
 	private static int nbDays;
 	private static int nbSlots;
@@ -59,6 +61,7 @@ public class ConvertisseurUSP {
 		SolutionUSP solution;
 		slot = Integer.parseInt(problem.getNrDays()) * Integer.parseInt(problem.getNrWeeks());
 		nbDays = Integer.parseInt(problem.getNrDays());
+		vectorTravel = getTravelVector(problem.getRooms());
 
 		students = convertionStudents(students, problem.getStudents());
 		rooms = convertionRooms(rooms, problem.getRooms());
@@ -119,6 +122,7 @@ public class ConvertisseurUSP {
 	}
 
 	private static void convertionDistibution(ArrayList<DistributionITC> distributions) {
+
 		for (DistributionITC distrib : distributions) {
 			if (distrib.getType().equals("SameAttendees") && distrib.getRequired().equals("true")) {
 				String s = "";
@@ -144,6 +148,35 @@ public class ConvertisseurUSP {
 		}
 	}
 
+	private static String getTravelVector(ArrayList<RoomITC> roomSITC) {
+		String s = "";
+		TravelsITC travels = new TravelsITC();
+		int size = roomSITC.size();
+		int indexRoom = 1;
+		for (RoomITC room : roomSITC) {
+			System.out.println(room.getId() + " " + room.getTravel().toString());
+			TravelsITC travelsRoom = room.getTravel();
+			int sizeAvant = s.length();
+			for (int i = indexRoom; i < size; i++) {
+				int index = travelsRoom.containsId(roomSITC.get(i).getId());
+				if (index > -1) {
+					s += travelsRoom.get(index).getValue();
+				} else {
+					s += "0";
+				}
+			}
+			indexRoom++;
+			travels.addAll(room.getTravel());
+			System.out.println(room.getId() + "  " + (s.length() - sizeAvant));
+		}
+		System.out.println(travels.toString());
+		System.out.println(s);
+		return s;
+
+		// peut être remplacer par deux boucle for sur la taille i et j=i+1 regarder si
+		// il y a un travel etntre les deux et le rajouter sinon 0
+	}
+
 	private static ArrayList<CourseUSP> convertionCourses(ArrayList<CourseUSP> coursesUsp,
 			ArrayList<CourseITC> coursesItc) {
 		for (CourseITC course : coursesItc) {
@@ -151,7 +184,6 @@ public class ConvertisseurUSP {
 			if (nbConfig == 1 || course.differentTimes4()) {
 				int i = 0;
 				if (nbConfig > 1) {
-					System.out.println(nbConfig);
 					changeStudentCourse(course.getId(), nbConfig);
 				}
 				for (ConfigITC conf : course.getConfig()) {
@@ -162,7 +194,7 @@ public class ConvertisseurUSP {
 							if (clas.checkWeeks()) {
 								setPeriodic(clas);
 							}
-
+							setSameRoomTeacher(clas);
 							if (clas.getTimes().size() > 0) {
 								String days = clas.getTimes().get(0).getDays();
 								if (Utils.Util.nbOccurrences(days, "1") == 1) {
@@ -177,7 +209,7 @@ public class ConvertisseurUSP {
 						}
 						AllowedRoomsUSP rooms = getAllowedRooms(sub.getClas());
 						AllowedSlotsUSP slots = getAllowedSlots(sub);
-						PartUSP part = new PartUSP(sub.getId(), "", "", classes, slots, rooms,
+						PartUSP part = new PartUSP(sub.getId(), sub.getNrSession(), "", classes, slots, rooms,
 								new AllowedTeachersUSP("0", new ArrayList<>()));
 						parts.add(part);
 					}
@@ -195,13 +227,37 @@ public class ConvertisseurUSP {
 		return coursesUsp;
 	}
 
+	private static void setSameRoomTeacher(ClassITC clas) {
+		// sameRoom
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		FilterUSP filter = new FilterUSP("class", "id");
+		filter.setIn(clas.getId());
+		filters.add(filter);
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setSessionsMask("1-" + clas.getNrSession());
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ConstraintUSP cons = new ConstraintUSP("SameRoom", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
+
+		// sameTeacher
+		ConstraintsUSP constraints2 = new ConstraintsUSP();
+		ConstraintUSP cons2 = new ConstraintUSP("SameTeacher", "hard", parameters);
+		constraints2.add(cons2);
+		rule = new RuleUSP(sessions, constraints2);
+		rules.add(rule);
+
+	}
+
 	private static void changeStudentCourse(String id, int size) {
-		System.out.println(id + " " + size);
 		StudentsUSP studentCourse = students.getStudentsCourse(id);
 		int i = 0;
 		int nb = 0;
 		for (StudentUSP student : studentCourse) {
-			System.out.print(student.getId() + ":" + i + "  ");
 			students.setStud(student.getId(), id, i);
 			if (i < size - 1 && nb == (i + 1) * ((studentCourse.size() / size) - 1)) {
 				i++;

@@ -39,6 +39,7 @@ import ITC.Model.TimesITC;
 import ITC.Model.TimesPenaltyITC;
 import ITC.Model.TimesPenaltysITC;
 import ITC.Model.TravelITC;
+import ITC.Model.TravelsITC;
 import Utils.Util;
 
 public class ReadITC {
@@ -291,7 +292,7 @@ public class ReadITC {
 		for (Element e : roomL) {
 			String id = e.getAttribute("id");
 			String capacity = e.getAttribute("capacity");
-			ArrayList<TravelITC> travel = new ArrayList<>();
+			TravelsITC travel = new TravelsITC();
 			ArrayList<TimesITC> unavailable = new ArrayList<>();
 			NodeList childTravel = e.getElementsByTagName("travel");
 			ArrayList<Element> travelL = Util.getElements(childTravel);

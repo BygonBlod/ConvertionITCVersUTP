@@ -4,22 +4,22 @@ import java.util.ArrayList;
 
 public class RoomITC {
 	private String id;
-	private ArrayList<TravelITC> travel;
+	private TravelsITC travel;
 	private String capacity;
 	private ArrayList<TimesITC> unvailable;
 
-	public RoomITC(String id, ArrayList<TravelITC> travel, String capacity, ArrayList<TimesITC> unvailable) {
+	public RoomITC(String id, TravelsITC travel, String capacity, ArrayList<TimesITC> unvailable) {
 		this.id = id;
 		this.travel = travel;
 		this.capacity = capacity;
 		this.unvailable = unvailable;
 	}
 
-	public ArrayList<TravelITC> getTravel() {
+	public TravelsITC getTravel() {
 		return travel;
 	}
 
-	public void setTravel(ArrayList<TravelITC> travel) {
+	public void setTravel(TravelsITC travel) {
 		this.travel = travel;
 	}
 
