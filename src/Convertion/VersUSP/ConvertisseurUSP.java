@@ -1,11 +1,5 @@
 package Convertion.VersUSP;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
 import ITC.Model.ClassITC;
@@ -81,16 +75,13 @@ public class ConvertisseurUSP {
 		time.setStudents(students);
 		time.setTeachers(teachers);
 
-		ArrayList<String> lignes = new ArrayList<>();
-		Path fichier = Paths.get("nbInstancesSlots.txt");
-		try {
-			lignes.add(time.getName());
-			lignes.add(nbSlotsF + " / " + nbSlots);
-			lignes.add("\n");
-			Files.write(fichier, lignes, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		/*
+		 * ArrayList<String> lignes = new ArrayList<>(); Path fichier =
+		 * Paths.get("nbInstancesSlots.txt"); try { lignes.add(time.getName());
+		 * lignes.add(nbSlotsF + " / " + nbSlots); lignes.add("\n");
+		 * Files.write(fichier, lignes, Charset.forName("UTF-8"),
+		 * StandardOpenOption.APPEND); } catch (IOException e) { e.printStackTrace(); }
+		 */
 		return time;
 	}
 
@@ -156,10 +147,12 @@ public class ConvertisseurUSP {
 	private static ArrayList<CourseUSP> convertionCourses(ArrayList<CourseUSP> coursesUsp,
 			ArrayList<CourseITC> coursesItc) {
 		for (CourseITC course : coursesItc) {
-			if (course.getConfig().size() == 1 || course.differentTimes4()) {
+			int nbConfig = course.getConfig().size();
+			if (nbConfig == 1 || course.differentTimes4()) {
 				int i = 0;
-				if (course.getConfig().size() > 1) {
-
+				if (nbConfig > 1) {
+					System.out.println(nbConfig);
+					changeStudentCourse(course.getId(), nbConfig);
 				}
 				for (ConfigITC conf : course.getConfig()) {
 					ArrayList<PartUSP> parts = new ArrayList<>();
@@ -200,6 +193,22 @@ public class ConvertisseurUSP {
 			}
 		}
 		return coursesUsp;
+	}
+
+	private static void changeStudentCourse(String id, int size) {
+		System.out.println(id + " " + size);
+		StudentsUSP studentCourse = students.getStudentsCourse(id);
+		int i = 0;
+		int nb = 0;
+		for (StudentUSP student : studentCourse) {
+			System.out.print(student.getId() + ":" + i + "  ");
+			students.setStud(student.getId(), id, i);
+			if (i < size - 1 && nb == (i + 1) * ((studentCourse.size() / size) - 1)) {
+				i++;
+			}
+			nb++;
+		}
+
 	}
 
 	private static void setSameSlot(String id, String type) {

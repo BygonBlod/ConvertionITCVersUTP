@@ -37,4 +37,9 @@ public class StudentUSP {
 		this.courses = courses;
 	}
 
+	public void changeCourse(String id2, int i) {
+		courses.set(courses.indexOf(id2), id2 + "-" + i);
+
+	}
+
 }

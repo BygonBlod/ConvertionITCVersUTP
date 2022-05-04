@@ -20,4 +20,13 @@ public class StudentsUSP extends ArrayList<StudentUSP> {
 		return res;
 	}
 
+	public void setStud(String id, String id2, int i) {
+		for (StudentUSP student : this) {
+			if (student.getId().equals(id)) {
+				student.changeCourse(id2, i);
+			}
+		}
+
+	}
+
 }
