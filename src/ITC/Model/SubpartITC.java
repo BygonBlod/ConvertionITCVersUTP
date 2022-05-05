@@ -164,8 +164,12 @@ public class SubpartITC {
 	}
 
 	public String getNrSession() {
-		int res = getAllTimes().get(0).getNbSes();
-		return res + "";
+		if (getAllTimes().size() > 0) {
+			int res = getAllTimes().get(0).getNbSes();
+			return res + "";
+		} else {
+			return "0";
+		}
 	}
 
 }

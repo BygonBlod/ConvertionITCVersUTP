@@ -122,59 +122,126 @@ public class ConvertisseurUSP {
 	}
 
 	private static void convertionDistibution(ArrayList<DistributionITC> distributions) {
-
 		for (DistributionITC distrib : distributions) {
-			if (distrib.getType().equals("SameAttendees") && distrib.getRequired().equals("true")) {
-				String s = "";
-				for (String classe : distrib.getClassId()) {
-					s += classe + ",";
-				}
-				if (s.length() > 1) {
-					s = s.substring(0, s.length() - 1);
-				}
-				SessionsRuleUSP sessions = new SessionsRuleUSP();
-				ConstraintsUSP constraints = new ConstraintsUSP();
-				ArrayList<FilterUSP> filters = new ArrayList<>();
-				FilterUSP filter = new FilterUSP("class", "id");
-				filter.setIn(s);
-				filters.add(filter);
-				SessionRuleUSP session = new SessionRuleUSP("courses", filters);
-				sessions.add(session);
-				ConstraintUSP cons = new ConstraintUSP("disjunctive", "hard", new ParametersUSP());
-				constraints.add(cons);
-				RuleUSP rule = new RuleUSP(sessions, constraints);
-				rules.add(rule);
+			String type = distrib.getType();
+			if (type.contains("(")) {
+				type = type.substring(0, type.indexOf("("));
+			}
+			switch (type) {
+			case "DifferentDays":
+				break;
+			case "DifferentRoom":
+				break;
+			case "DifferentTime":
+				break;
+			case "DifferentWeeks":
+				break;
+			case "MaxBlock":
+				break;
+			case "MaxDayLoad":
+				break;
+			case "MaxBreaks":
+				break;
+			case "MaxDays":
+				break;
+			case "MinGap":
+				break;
+			case "NotOverlap":
+				break;
+			case "Overlap":
+				break;
+			case "Precedence":
+				convertionPrecedenceToSequenced(distrib);
+				break;
+			case "SameAttendees":
+				convertionSameAttendeesToTravelTime(distrib);
+				break;
+			case "SameDays":
+				break;
+			case "SameRoom":
+				break;
+			case "SameStart":
+				break;
+			case "SameTime":
+				break;
+			case "SameWeeks":
+				break;
+			case "WorkDay":
+				break;
 			}
 		}
 	}
 
-	private static String getTravelVector(ArrayList<RoomITC> roomSITC) {
+	private static void convertionPrecedenceToSequenced(DistributionITC distrib) {
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		for (String classe : distrib.getClassId()) {
+			ArrayList<FilterUSP> filters = new ArrayList<>();
+			FilterUSP filter = new FilterUSP("class", "id");
+			filter.setIn(classe);
+			filters.add(filter);
+			SessionRuleUSP session = new SessionRuleUSP("class", filters);
+			session.setSessionsMask("1");
+			sessions.add(session);
+		}
+
+		ParametersUSP parameters = new ParametersUSP();
+		ConstraintUSP cons = new ConstraintUSP("Sequenced", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
+	}
+
+	public static void convertionSameAttendeesToTravelTime(DistributionITC distrib) {
 		String s = "";
-		TravelsITC travels = new TravelsITC();
+		for (String classe : distrib.getClassId()) {
+			s += classe + ",";
+		}
+		if (s.length() > 1) {
+			s = s.substring(0, s.length() - 1);
+		}
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		FilterUSP filter = new FilterUSP("class", "id");
+		filter.setIn(s);
+		filters.add(filter);
+		SessionRuleUSP session = new SessionRuleUSP("courses", filters);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ParameterUSP parameter = new ParameterUSP("travels");
+		parameter.setType("slots");
+		parameter.setValue(vectorTravel);
+		parameters.add(parameter);
+		ConstraintUSP cons = new ConstraintUSP("TravelTime", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
+	}
+
+	private static String getTravelVector(ArrayList<RoomITC> roomSITC) {
 		int size = roomSITC.size();
-		int indexRoom = 1;
-		for (RoomITC room : roomSITC) {
-			System.out.println(room.getId() + " " + room.getTravel().toString());
-			TravelsITC travelsRoom = room.getTravel();
-			int sizeAvant = s.length();
-			for (int i = indexRoom; i < size; i++) {
-				int index = travelsRoom.containsId(roomSITC.get(i).getId());
-				if (index > -1) {
-					s += travelsRoom.get(index).getValue();
+		String s2 = "";
+		for (int i = 0; i < size; i++) {
+			RoomITC roomi = roomSITC.get(i);
+			TravelsITC travelsRoomi = roomi.getTravel();
+			for (int j = i + 1; j < size; j++) {
+				RoomITC roomj = roomSITC.get(j);
+				TravelsITC travelsRoomj = roomj.getTravel();
+				int index = travelsRoomi.containsId(roomj.getId());
+				int index2 = travelsRoomj.containsId(roomi.getId());
+				if (index > -1 || index2 > -1) {
+					if (index > -1) {
+						s2 += travelsRoomi.get(index).getValue();
+					} else {
+						s2 += travelsRoomj.get(index2).getValue();
+					}
 				} else {
-					s += "0";
+					s2 += "0";
 				}
 			}
-			indexRoom++;
-			travels.addAll(room.getTravel());
-			System.out.println(room.getId() + "  " + (s.length() - sizeAvant));
 		}
-		System.out.println(travels.toString());
-		System.out.println(s);
-		return s;
-
-		// peut être remplacer par deux boucle for sur la taille i et j=i+1 regarder si
-		// il y a un travel etntre les deux et le rajouter sinon 0
+		return s2;
 	}
 
 	private static ArrayList<CourseUSP> convertionCourses(ArrayList<CourseUSP> coursesUsp,
