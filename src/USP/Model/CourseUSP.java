@@ -37,4 +37,19 @@ public class CourseUSP {
 		this.parts = parts;
 	}
 
+	public ArrayList<String> getAllClassId() {
+		ArrayList<String> res = new ArrayList<>();
+		for (PartUSP part : this.getParts()) {
+			for (ClassUSP classe : part.getClasses()) {
+				res.add(classe.getId());
+			}
+		}
+		return res;
+	}
+
+	public ArrayList<String> getPartNotContain(ArrayList<String> classId) {
+
+		return null;
+	}
+
 }
