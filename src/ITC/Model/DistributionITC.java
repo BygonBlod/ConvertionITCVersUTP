@@ -15,6 +15,17 @@ public class DistributionITC {
 		this.penalty = "";
 	}
 
+	public String getClassIDString() {
+		String s = "";
+		for (String classe : getClassId()) {
+			s += classe + ",";
+		}
+		if (s.length() > 1) {
+			s = s.substring(0, s.length() - 1);
+		}
+		return s;
+	}
+
 	public String getType() {
 		return type;
 	}

@@ -191,53 +191,185 @@ public class ConvertisseurUSP {
 	}
 
 	private static void convertionDifferentDaysToDifferentWeeklyDay(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ConstraintUSP cons = new ConstraintUSP("DifferentWeeklyDay", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 
 	}
 
 	private static void convertionDifferentRoomToDifferentRoom(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ConstraintUSP cons = new ConstraintUSP("DifferentRoom", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 
 	}
 
 	private static void convertionDifferentTimeToDisjunctiveDaily(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ConstraintUSP cons = new ConstraintUSP("DisjunctiveDily", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 
 	}
 
 	private static void convertionDifferentWeeksToDisjunctiveWeeks(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ConstraintUSP cons = new ConstraintUSP("DisjunctiveWeeks", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 
 	}
 
 	private static void convertionMaxBlockToAtMostConsecutive(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		String type = distrib.getType();
+		String valueM = type.substring(type.indexOf("(") + 1, type.indexOf(","));
+		String valueS = type.substring(type.indexOf(",") + 1, type.indexOf(")"));
 
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ParameterUSP parameter = new ParameterUSP("M");
+		parameter.setType("slot");
+		parameter.setValue(valueM);
+		parameters.add(parameter);
+		ParameterUSP parameter2 = new ParameterUSP("S");
+		parameter2.setType("slot");
+		parameter2.setValue(valueS);
+		parameters.add(parameter2);
+		ConstraintUSP cons = new ConstraintUSP("atMostConsecutive", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 	}
 
 	private static void convertionMaxDayLoadToAtMostDaily(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		String type = distrib.getType();
+		String value = type.substring(type.indexOf("(") + 1, type.indexOf(")"));
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ParameterUSP parameter = new ParameterUSP("first");
+		parameter.setType("slot");
+		parameter.setValue("1");
+		parameters.add(parameter);
+		ParameterUSP parameter2 = new ParameterUSP("last");
+		parameter2.setType("slot");
+		parameter2.setValue("1440");
+		parameters.add(parameter2);
+		ParameterUSP parameter3 = new ParameterUSP("count");
+		parameter3.setType("slot");
+		parameter3.setValue(value);
+		parameters.add(parameter3);
+		ConstraintUSP cons = new ConstraintUSP("atMostDaily", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 
 	}
 
 	private static void convertionMaxBreaksToMaxBreaks(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ParameterUSP parameter = new ParameterUSP("maxBreaks");
+		parameter.setType("int");
+		String type = distrib.getType();
+		String valueR = type.substring(type.indexOf("(") + 1, type.indexOf(","));
+		parameter.setValue(valueR);
+		parameters.add(parameter);
+		ParameterUSP parameter2 = new ParameterUSP("time");
+		parameter2.setType("slot");
+		String valueS = type.substring(type.indexOf(",") + 1, type.indexOf(")"));
+		parameter2.setValue(valueS);
+		parameters.add(parameter2);
+		ConstraintUSP cons = new ConstraintUSP("maxWeekDay", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 
 	}
 
 	private static void convertionMaxDaysToMaxWeekDays(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ParameterUSP parameter = new ParameterUSP("max");
+		parameter.setType("slot");
+		String type = distrib.getType();
+		String value = Integer.parseInt(type.substring(type.indexOf("(") + 1, type.indexOf(")"))) * 5 + "";
+		parameter.setValue(value);
+		parameters.add(parameter);
+		ConstraintUSP cons = new ConstraintUSP("maxWeekDay", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 
 	}
 
 	private static void convertionMinGapToMinGap(DistributionITC distrib) {
-		String s = "";
-		for (String classe : distrib.getClassId()) {
-			s += classe + ",";
-		}
-		if (s.length() > 1) {
-			s = s.substring(0, s.length() - 1);
-		}
+		String s = distrib.getClassIDString();
 		SessionsRuleUSP sessions = new SessionsRuleUSP();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ArrayList<FilterUSP> filters = new ArrayList<>();
@@ -260,13 +392,7 @@ public class ConvertisseurUSP {
 	}
 
 	private static void convertionNotOverlapToDisjunctive(DistributionITC distrib) {
-		String s = "";
-		for (String classe : distrib.getClassId()) {
-			s += classe + ",";
-		}
-		if (s.length() > 1) {
-			s = s.substring(0, s.length() - 1);
-		}
+		String s = distrib.getClassIDString();
 		SessionsRuleUSP sessions = new SessionsRuleUSP();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ArrayList<FilterUSP> filters = new ArrayList<>();
@@ -284,7 +410,19 @@ public class ConvertisseurUSP {
 	}
 
 	private static void convertionOverlapToOverlap(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ConstraintUSP cons = new ConstraintUSP("Overlap", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 
 	}
 
@@ -309,13 +447,7 @@ public class ConvertisseurUSP {
 	}
 
 	public static void convertionSameAttendeesToTravelTime(DistributionITC distrib) {
-		String s = "";
-		for (String classe : distrib.getClassId()) {
-			s += classe + ",";
-		}
-		if (s.length() > 1) {
-			s = s.substring(0, s.length() - 1);
-		}
+		String s = distrib.getClassIDString();
 		SessionsRuleUSP sessions = new SessionsRuleUSP();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ArrayList<FilterUSP> filters = new ArrayList<>();
@@ -336,19 +468,23 @@ public class ConvertisseurUSP {
 	}
 
 	private static void convertionSameDaysToSameWeekDay(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ConstraintUSP cons = new ConstraintUSP("sameWeekDay", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 
 	}
 
 	private static void convertionSameRoomToSameRooms(DistributionITC distrib) {
-		// <rule>
-		// <sessions groupBy="class">
-		// <filter type="course" attributeName="id" in="Web-Development"/>
-		// <filter type="part" attributeName="label" notIn="EVAL"/>
-		// </sessions>
-		// <constraint name="sameRooms" type="hard">
-		// </constraint>
-		// </rule>
 		SessionsRuleUSP sessions = new SessionsRuleUSP();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ArrayList<FilterUSP> filters = getCourse(distrib.getClassId());
@@ -393,23 +529,80 @@ public class ConvertisseurUSP {
 	}
 
 	private static void convertionSameStartToSameDailySlot(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ConstraintUSP cons = new ConstraintUSP("sameDailySlot", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 
 	}
 
 	private static void convertionSameTimeToDuring(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ConstraintUSP cons = new ConstraintUSP("During", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 
 	}
 
 	private static void convertionSameWeeksToSameWeeks(DistributionITC distrib) {
-		// TODO Auto-generated method stub
+		String s = distrib.getClassIDString();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ConstraintUSP cons = new ConstraintUSP("sameWeeks", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 
 	}
 
 	private static void convertionWorkDayToWorkLoad(DistributionITC distrib) {
-		// TODO Auto-generated method stub
-
+		String s = distrib.getClassIDString();
+		SessionsRuleUSP sessions = new SessionsRuleUSP();
+		ConstraintsUSP constraints = new ConstraintsUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
+		sessions.add(session);
+		ParametersUSP parameters = new ParametersUSP();
+		ParameterUSP parameter = new ParameterUSP("value");
+		parameter.setType("slots");
+		String type = distrib.getType();
+		String value = Integer.parseInt(type.substring(type.indexOf("(") + 1, type.indexOf(")"))) * 5 + "";
+		parameter.setValue(value);
+		parameters.add(parameter);
+		ParameterUSP parameter2 = new ParameterUSP("unit");
+		parameter2.setType("time");
+		parameter2.setValue("dailySlot");
+		parameters.add(parameter2);
+		ConstraintUSP cons = new ConstraintUSP("WorkLoad", "hard", parameters);
+		constraints.add(cons);
+		RuleUSP rule = new RuleUSP(sessions, constraints);
+		rules.add(rule);
 	}
 
 	private static String getTravelVector(ArrayList<RoomITC> roomSITC) {
