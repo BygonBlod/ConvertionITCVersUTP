@@ -485,14 +485,18 @@ public class ConvertisseurUSP {
 	}
 
 	private static void convertionSameRoomToSameRooms(DistributionITC distrib) {
+		String s = distrib.getClassIDString();
 		SessionsRuleUSP sessions = new SessionsRuleUSP();
 		ConstraintsUSP constraints = new ConstraintsUSP();
-		ArrayList<FilterUSP> filters = getCourse(distrib.getClassId());
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		// ArrayList<FilterUSP> filters = getCourse(distrib.getClassId());
 		/*
 		 * FilterUSP filter = new FilterUSP("part", "id"); filter.setIn(s);
 		 * filters.add(filter);
 		 */
 		SessionRuleUSP session = new SessionRuleUSP("class", filters);
+		session.setAttributeName("id");
+		session.setIn(s);
 		sessions.add(session);
 		ParametersUSP parameters = new ParametersUSP();
 		ConstraintUSP cons = new ConstraintUSP("sameRooms", "hard", parameters);
