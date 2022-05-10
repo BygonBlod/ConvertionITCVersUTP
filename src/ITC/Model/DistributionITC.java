@@ -2,6 +2,10 @@ package ITC.Model;
 
 import java.util.ArrayList;
 
+import USP.Model.FilterUSP;
+import USP.Model.SessionRuleUSP;
+import USP.Model.SessionsRuleUSP;
+
 public class DistributionITC {
 	private String type;
 	private String required;
@@ -24,6 +28,18 @@ public class DistributionITC {
 			s = s.substring(0, s.length() - 1);
 		}
 		return s;
+	}
+
+	public SessionsRuleUSP getSessionIdClass() {
+		SessionsRuleUSP res = new SessionsRuleUSP();
+		ArrayList<FilterUSP> filters = new ArrayList<>();
+		for (String classe : getClassId()) {
+			SessionRuleUSP session = new SessionRuleUSP("class", filters);
+			session.setAttributeName("id");
+			session.setIn(classe);
+			res.add(session);
+		}
+		return res;
 	}
 
 	public String getType() {
