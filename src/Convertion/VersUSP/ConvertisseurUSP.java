@@ -38,7 +38,6 @@ import USP.Model.TeacherUSP;
 import USP.Model.Timetabling;
 
 public class ConvertisseurUSP {
-	private static boolean unionroom = false;
 	private static boolean multipleConfig = false;
 	private static RulesUSP rules;
 	private static StudentsUSP students;
@@ -49,8 +48,7 @@ public class ConvertisseurUSP {
 	private static int nbSlots;
 	private static int nbSlotsF;
 
-	public static Timetabling getTimeTabling(ProblemITC problem, boolean unionR, boolean multiple) {
-		unionroom = unionR;
+	public static Timetabling getTimeTabling(ProblemITC problem, boolean multiple) {
 		multipleConfig = multiple;
 		nbSlots = 0;
 		nbSlotsF = 0;
@@ -496,7 +494,7 @@ public class ConvertisseurUSP {
 			ArrayList<CourseITC> coursesItc) {
 		for (CourseITC course : coursesItc) {
 			int nbConfig = course.getConfig().size();
-			if (nbConfig == 1 || course.differentTimes4()) {
+			if (nbConfig == 1 || (course.differentTimes4() && multipleConfig)) {
 				int i = 0;
 				if (nbConfig > 1) {
 					changeStudentCourse(course.getId(), nbConfig);

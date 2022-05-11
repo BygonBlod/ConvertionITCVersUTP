@@ -66,8 +66,7 @@ public class WriteUSP {
 			final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			final Transformer transformer = transformerFactory.newTransformer();
 			final DOMSource source = new DOMSource(document);
-			final StreamResult sortie = new StreamResult(new File(filename));
-			// final StreamResult sortie = new StreamResult(System.out);
+			final StreamResult sortie = new StreamResult(new File(time.getName() + "USP.xml"));
 
 			// prologue
 			transformer.setOutputProperty(OutputKeys.VERSION, "1.0");
