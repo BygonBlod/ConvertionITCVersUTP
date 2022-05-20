@@ -53,7 +53,8 @@ public class WriteUSP {
 			racine.setAttribute(Value_USP.Attibute_NrSlotsPerDay, time.getNrSlotsPerDay());
 			racine.setAttribute(Value_USP.Attibute_NrWeeks, time.getNrWeeks());
 			racine.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-			racine.setAttribute("xsi:schemaLocation", "test");// à changer par usp_timetabling_v0_2.xsd
+			racine.setAttribute("xsi:schemaLocation", "usp_timetabling_v0_2.xsd");// à changer par
+																					// usp_timetabling_v0_2.xsd
 
 			setRooms(document, racine, time.getRooms());
 			setTeachers(document, racine, time.getTeachers());

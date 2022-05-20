@@ -192,7 +192,7 @@ public class ConvertisseurUSP {
 		SessionsRuleUSP sessions = distrib.getSessionIdClass();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ParametersUSP parameters = new ParametersUSP();
-		ConstraintUSP cons = new ConstraintUSP("DisjointWeekDays", "hard", parameters);
+		ConstraintUSP cons = new ConstraintUSP("disjointWeekDays", "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
 		rules.add(rule);
@@ -203,7 +203,7 @@ public class ConvertisseurUSP {
 		SessionsRuleUSP sessions = distrib.getSessionIdClass();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ParametersUSP parameters = new ParametersUSP();
-		ConstraintUSP cons = new ConstraintUSP("DisjointRooms", "hard", parameters);
+		ConstraintUSP cons = new ConstraintUSP("disjointRooms", "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
 		rules.add(rule);
@@ -214,7 +214,7 @@ public class ConvertisseurUSP {
 		SessionsRuleUSP sessions = distrib.getSessionIdClass();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ParametersUSP parameters = new ParametersUSP();
-		ConstraintUSP cons = new ConstraintUSP("DisjunctiveDily", "hard", parameters);
+		ConstraintUSP cons = new ConstraintUSP("disjunctiveDaily", "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
 		rules.add(rule);
@@ -225,7 +225,7 @@ public class ConvertisseurUSP {
 		SessionsRuleUSP sessions = distrib.getSessionIdClass();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ParametersUSP parameters = new ParametersUSP();
-		ConstraintUSP cons = new ConstraintUSP("DisjointWeeks", "hard", parameters);
+		ConstraintUSP cons = new ConstraintUSP("disjointWeeks", "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
 		rules.add(rule);
@@ -294,7 +294,7 @@ public class ConvertisseurUSP {
 		String valueS = type.substring(type.indexOf(",") + 1, type.indexOf(")"));
 		parameter2.setValue(valueS);
 		parameters.add(parameter2);
-		ConstraintUSP cons = new ConstraintUSP("maxWeekDay", "hard", parameters);
+		ConstraintUSP cons = new ConstraintUSP("maxBreaks", "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
 		rules.add(rule);
@@ -350,7 +350,7 @@ public class ConvertisseurUSP {
 		SessionsRuleUSP sessions = distrib.getSessionIdClass();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ParametersUSP parameters = new ParametersUSP();
-		ConstraintUSP cons = new ConstraintUSP("Overlap", "hard", parameters);
+		ConstraintUSP cons = new ConstraintUSP("overlap", "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
 		rules.add(rule);
@@ -370,7 +370,7 @@ public class ConvertisseurUSP {
 		}
 
 		ParametersUSP parameters = new ParametersUSP();
-		ConstraintUSP cons = new ConstraintUSP("Sequenced", "hard", parameters);
+		ConstraintUSP cons = new ConstraintUSP("sequenced", "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
 		rules.add(rule);
@@ -384,7 +384,7 @@ public class ConvertisseurUSP {
 		parameter.setType("slots");
 		parameter.setValue(vectorTravel);
 		parameters.add(parameter);
-		ConstraintUSP cons = new ConstraintUSP("TravelTime", "hard", parameters);
+		ConstraintUSP cons = new ConstraintUSP("travelTime", "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
 		rules.add(rule);
@@ -394,7 +394,7 @@ public class ConvertisseurUSP {
 		SessionsRuleUSP sessions = distrib.getSessionIdClass();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ParametersUSP parameters = new ParametersUSP();
-		ConstraintUSP cons = new ConstraintUSP("sameWeekDay", "hard", parameters);
+		ConstraintUSP cons = new ConstraintUSP("sameWeekDays", "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
 		rules.add(rule);
@@ -427,7 +427,7 @@ public class ConvertisseurUSP {
 		SessionsRuleUSP sessions = distrib.getSessionIdClass();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ParametersUSP parameters = new ParametersUSP();
-		ConstraintUSP cons = new ConstraintUSP("During", "hard", parameters);
+		ConstraintUSP cons = new ConstraintUSP("during", "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
 		rules.add(rule);
@@ -459,7 +459,7 @@ public class ConvertisseurUSP {
 		parameter2.setType("time");
 		parameter2.setValue("dailySlot");
 		parameters.add(parameter2);
-		ConstraintUSP cons = new ConstraintUSP("WorkLoad", "hard", parameters);
+		ConstraintUSP cons = new ConstraintUSP("workLoad", "hard", parameters);
 		constraints.add(cons);
 		RuleUSP rule = new RuleUSP(sessions, constraints);
 		rules.add(rule);
@@ -638,7 +638,7 @@ public class ConvertisseurUSP {
 	}
 
 	private static AllowedRoomsUSP getAllowedRooms(ArrayList<ClassITC> clas) {
-		AllowedRoomsUSP rooms = new AllowedRoomsUSP("none");
+		AllowedRoomsUSP rooms = new AllowedRoomsUSP("single");
 		for (ClassITC classe : clas) {
 			for (ClassRoomITC room : classe.getRooms()) {
 				if (!rooms.containsRoom(room.getId())) {
