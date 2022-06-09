@@ -236,6 +236,8 @@ public class ConvertisseurUSP {
 		String type = distrib.getType();
 		String valueM = type.substring(type.indexOf("(") + 1, type.indexOf(","));
 		String valueS = type.substring(type.indexOf(",") + 1, type.indexOf(")"));
+		valueM = Integer.parseInt(valueM) * 5 + "";
+		valueS = Integer.parseInt(valueS) * 5 + "";
 
 		SessionsRuleUSP sessions = distrib.getSessionIdClass();
 		ConstraintsUSP constraints = new ConstraintsUSP();
@@ -257,6 +259,7 @@ public class ConvertisseurUSP {
 	private static void convertionMaxDayLoadToAtMostDaily(DistributionITC distrib) {
 		String type = distrib.getType();
 		String value = type.substring(type.indexOf("(") + 1, type.indexOf(")"));
+		value = Integer.parseInt(value) * 5 + "";
 		SessionsRuleUSP sessions = distrib.getSessionIdClass();
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ParametersUSP parameters = new ParametersUSP();
@@ -292,6 +295,7 @@ public class ConvertisseurUSP {
 		ParameterUSP parameter2 = new ParameterUSP("time");
 		parameter2.setType("slot");
 		String valueS = type.substring(type.indexOf(",") + 1, type.indexOf(")"));
+		valueS = Integer.parseInt(valueS) * 5 + "";
 		parameter2.setValue(valueS);
 		parameters.add(parameter2);
 		ConstraintUSP cons = new ConstraintUSP("maxBreaks", "hard", parameters);
@@ -306,9 +310,9 @@ public class ConvertisseurUSP {
 		ConstraintsUSP constraints = new ConstraintsUSP();
 		ParametersUSP parameters = new ParametersUSP();
 		ParameterUSP parameter = new ParameterUSP("max");
-		parameter.setType("slot");
+		parameter.setType("int");
 		String type = distrib.getType();
-		String value = Integer.parseInt(type.substring(type.indexOf("(") + 1, type.indexOf(")"))) * 5 + "";
+		String value = type.substring(type.indexOf("(") + 1, type.indexOf(")"));
 		parameter.setValue(value);
 		parameters.add(parameter);
 		ConstraintUSP cons = new ConstraintUSP("maxWeekDay", "hard", parameters);
@@ -478,15 +482,19 @@ public class ConvertisseurUSP {
 				int index2 = travelsRoomj.containsId(roomi.getId());
 				if (index > -1 || index2 > -1) {
 					if (index > -1) {
-						s2 += travelsRoomi.get(index).getValue();
+						String value1 = travelsRoomi.get(index).getValue() + "";
+						s2 += value1;
 					} else {
-						s2 += travelsRoomj.get(index2).getValue();
+						String value2 = travelsRoomj.get(index2).getValue() + "";
+						s2 += value2;
 					}
 				} else {
 					s2 += "0";
 				}
+				s2 += ",";
 			}
 		}
+		s2 = s2.substring(0, s2.length() - 1);
 		return s2;
 	}
 
